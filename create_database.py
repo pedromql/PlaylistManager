@@ -1,5 +1,6 @@
 import sqlalchemy
-from sqlalchemy import Table, Column, Integer, String, create_engine, Sequence, ForeignKey
+import time, datetime
+from sqlalchemy import Table, Column, Integer, String, create_engine, Sequence, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -34,6 +35,7 @@ class Playlist(Base):
 	__tablename__ = 'playlist'
 	id = Column(Integer, primary_key=True)
 	name = Column(String(100))
+	date = Column(DateTime, default=datetime.datetime.utcnow )
 
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship("User", back_populates="playlists")
