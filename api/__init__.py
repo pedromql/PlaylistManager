@@ -11,7 +11,7 @@ application = app = Flask(__name__)
 
 def create_session():
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://' + user_password + '@localhost:3306')
+    engine = create_engine('mysql+pymysql://' + user_password + '@localhost:3306/test_playlist_manager')
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
@@ -26,3 +26,4 @@ def access(token):
 
 
 import api.user
+import api.main

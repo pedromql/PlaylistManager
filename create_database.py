@@ -22,6 +22,7 @@ class User(Base):
 	username = Column(String(40))
 	password = Column(String(40))
 	name = Column(String(100))
+	token = Column(String(100))
 
 	#TODO 
 	#DONE user has songs, user has playlists
