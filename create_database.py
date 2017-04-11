@@ -19,8 +19,8 @@ playlists_songs = Table('playlists_songs', Base.metadata,
 class User(Base):
 	__tablename__ = 'user'
 	id = Column(Integer, primary_key=True)
-	username = Column(String(40))
-	password = Column(String(40))
+	email = Column(String(40))
+	password = Column(String(80))
 	name = Column(String(100))
 	token = Column(String(100))
 
@@ -28,7 +28,7 @@ class User(Base):
 	#DONE user has songs, user has playlists
 
 	def __repr__(self):
-		return "<User(name='%s', username='%s', password='%s', id='%s'>" % (self.name, self.username, self.password, self.id)
+		return "<User(name='%s', email='%s', password='%s', id='%s'>" % (self.name, self.email, self.password, self.id)
 
 class Playlist(Base):
 	__tablename__ = 'playlist'

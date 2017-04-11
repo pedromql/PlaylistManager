@@ -2,6 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 from create_database import *
 from flask import *
+import hashlib
 
 
 user_password = "root:root"
@@ -22,7 +23,10 @@ def access(token):
     session.close()
     return user
 
-
+def encrypt(password):
+    m = hashlib.md5()
+    m.update(password.encode('utf-8'))
+    return m.hexdigest()
 
 
 import api.user
