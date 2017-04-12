@@ -36,4 +36,5 @@ def getToken():
 
 
 import api.user
+import api.playlist
 import api.main
