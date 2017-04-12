@@ -22,16 +22,19 @@ def create_session():
     session = Session()
     return session
 
+
 def access(token):
     session = create_session()
     user = session.query(User).filter_by(token=token).first()
     session.close()
     return user
 
+
 def encrypt(password):
     m = hashlib.md5()
     m.update(password.encode('utf-8'))
     return m.hexdigest()
+
 
 def getToken():
     try:
@@ -39,18 +42,20 @@ def getToken():
     except Exception as e:
         return 1
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-def verifyJsonValue(value, message):
-    if value is None or value == "":
-        return jsonResponse('Error',message,403)
+
+def verifyJsonValue(value, message, min, max):
+    if value is None or value == "" or len(value) < min or len(value) > max:
+        return 1
     else:
         return 0
 
 
-def jsonResponse(result,message,code):
+def jsonResponse(result, message, code):
     response_data = {
         'result': result,
         'message': message
@@ -60,6 +65,7 @@ def jsonResponse(result,message,code):
     response.status_code = code
 
     return response
+
 
 import api.user
 import api.playlist
