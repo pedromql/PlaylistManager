@@ -8,7 +8,7 @@ $( document ).ready(function() {
 
     	form_data.append("token", "teste do crl");
         form_data.append("title", "merda para isto");
-        form_data.append("path","/test");
+        form_data.append("path","/test/banan.mp3");
         form_data.append("artist","banan player");
         form_data.append("album","banan player");
         form_data.append("release","banan player");

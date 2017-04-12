@@ -50,8 +50,11 @@ def upload():
             return jsonResponse('Error','No file',403)
 
         # files created inside folder music
-        if not os.path.exists(app.config['UPLOAD_FOLDER'] + path):
-            os.makedirs(app.config['UPLOAD_FOLDER'] + path)
+        dir = ""
+        for i in path.split('/')[:-1]:
+            dir += i + '/'
+        if not os.path.exists(app.config['UPLOAD_FOLDER'] + dir):
+            os.makedirs(app.config['UPLOAD_FOLDER'] + dir)
 
         if song and song.filename != '':
             old_file_position = song.tell()
@@ -67,12 +70,12 @@ def upload():
 
 
             #if song exists remove the old one
-            if os.path.isfile(app.config['UPLOAD_FOLDER'] +'/'+ path +'/'+ artist + "-" + title + ".mp3"):
-                os.remove(app.config['UPLOAD_FOLDER'] +'/'+ path +'/'+ artist + "-" + title + ".mp3")
+            if os.path.isfile(app.config['UPLOAD_FOLDER'] + path):
+                os.remove(app.config['UPLOAD_FOLDER'] + path )
 
             if allowed_file(song.filename.lower()):
                 song.filename = artist + "-" + title
-                song.save(app.config['UPLOAD_FOLDER'] +'/'+ path +'/'+ artist + "-" + title + ".mp3")
+                song.save(app.config['UPLOAD_FOLDER'] + path)
 
 
 
