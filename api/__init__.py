@@ -28,6 +28,12 @@ def encrypt(password):
     m.update(password.encode('utf-8'))
     return m.hexdigest()
 
+def getToken():
+    try:
+        return request.json['token']
+    except Exception as e:
+        return 1
+
 
 import api.user
 import api.main
