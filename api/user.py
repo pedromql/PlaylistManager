@@ -217,17 +217,18 @@ def login():
 
         email = request.json['email']
         password = request.json['password']
-        name  = request.json['name']
+        password = encrypt(password)
 
         session = create_session()
 
-        #check if username/password combo
+        #check if email/password combo
         user  = session.query(User).filter(User.email == email, User.password == password).first()
         
         #if username/password combo is correct return success with token
         if user is not None:
 
             token = user.token
+            name = user.name
             
             session.close()
 
