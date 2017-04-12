@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+
+    <style>
+        #upload .thumbnail{
+            width:150px;
+            height: 150px;
+            float:left;
+            margin:2px;
+        }
+        #upload .thumbnail img{
+            width:150px;
+            height: 150px;
+        }
+
+    </style>
+</head>
+<body>
+<h2>Upload song ...</h2>
+
+ <form action="javascript:void(0)" id="registo-form" class="templatemo-login-form hidden" enctype="multipart/form-data" method="post">
+
+<input type="file" id="fileinput" multiple="multiple" accept="audio/*" />
+
+
+<div class="form-group text-center">
+                            <input type="submit" class="templatemo-blue-button" name="submit" value="submit">
+                        </div>
+                    </form>
+
+<div id="upload"></div>
+<script src="index.js"></script>
+</body>
+</html>
+
