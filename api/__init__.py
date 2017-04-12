@@ -9,6 +9,11 @@ user_password = "root:root"
 
 application = app = Flask(__name__)
 
+UPLOAD_FOLDER = '/home/filipes/Music'
+ALLOWED_EXTENSIONS = set(['mp3'])
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def create_session():
     Base = declarative_base()
@@ -34,7 +39,29 @@ def getToken():
     except Exception as e:
         return 1
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+def verifyJsonValue(value, message):
+    if value is None or value == "":
+        return jsonResponse('Error',message,403)
+    else:
+        return 0
+
+
+def jsonResponse(result,message,code):
+    response_data = {
+        'result': result,
+        'message': message
+    }
+
+    response = jsonify(response_data)
+    response.status_code = code
+
+    return response
 
 import api.user
 import api.playlist
 import api.main
+import api.song
