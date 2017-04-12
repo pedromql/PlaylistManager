@@ -139,7 +139,7 @@ def edit():
         in case of success the index is None, Not changed if the DB as the same value, and 403 forbidden in case of bad input
         '''
         #print(responses)
-        #TODO if to change the response 
+        #TODO if to change the response
         response_data = {
             'result': 'Success',
             'message': 'User updated successfuly'
@@ -159,7 +159,6 @@ def edit_value(type, token, value):
         session = create_session()
         user = access(token)
 
-
         if (type == 'email'):
             if(user.email == value):
                 return "Not changed"
@@ -174,8 +173,6 @@ def edit_value(type, token, value):
 
                 return response
 
-            session.query(User).filter(User.token == token).update({"email": (value)})
-            session.commit()
         elif(type == 'name'):
             if (user.name == value):
                 return "Not changed"
@@ -189,9 +186,6 @@ def edit_value(type, token, value):
                 response.status_code = 403
 
                 return response
-
-            session.query(User).filter(User.token == token).update({"name": (value)})
-            session.commit()
 
         elif(type == 'password'):
             if (user.password == encrypt(value)):
@@ -207,11 +201,9 @@ def edit_value(type, token, value):
 
                 return response
 
-            password = encrypt(value)
-
-            session.query(User).filter(User.token == token).update({"password": (password)})
-            session.commit()
-
+            value = encrypt(value)
+        session.query(User).filter(User.token == token).update({type: (value)})
+        session.commit()
         session.close()
 
     except Exception as e:
