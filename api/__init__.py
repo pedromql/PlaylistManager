@@ -9,7 +9,7 @@ user_password = "root:root"
 
 application = app = Flask(__name__)
 
-UPLOAD_FOLDER = '/home/filipes/Music'
+UPLOAD_FOLDER = '/home/work/Music'
 ALLOWED_EXTENSIONS = set(['mp3'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -48,7 +48,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-def verifyJsonValue(value, message, min, max):
+def verifyJsonValue(value, min, max):
     if value is None or value == "" or len(value) < min or len(value) > max:
         return 1
     else:

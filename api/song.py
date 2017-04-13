@@ -1,11 +1,11 @@
 import os
 from flask import *
 from create_database import *
-from api import app, access, create_session, allowed_file, verifyJsonValue, jsonResponse
+from api import app, access, create_session, allowed_file, verifyJsonValue, jsonResponse, getToken
 
 
 @app.route('/api/song/create', methods=['POST'])
-def create():
+def createsong():
     try:
         token = request.form['token']
         path = request.form['path']
@@ -23,21 +23,21 @@ def create():
         user = access(token)
 
         if user is None or user == "":
-            return verifyJsonValue(user, 'Invalid user', 1, 100)
+            return verifyJsonValue(user, 1, 100)
 
-        if verifyJsonValue(path, 'Invalid path', 1, 200) != 0:
+        if verifyJsonValue(path, 1, 200) != 0:
             return jsonResponse('Error', 'Invalid path', 403)
 
-        if verifyJsonValue(title, 'Invalid title', 1, 100) != 0:
+        if verifyJsonValue(title, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid title', 403)
 
-        if verifyJsonValue(artist, 'Invalid artist', 1, 100) != 0:
+        if verifyJsonValue(artist, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid artist', 403)
 
-        if verifyJsonValue(album, 'Invalid album', 1, 100) != 0:
+        if verifyJsonValue(album, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid album', 403)
 
-        if verifyJsonValue(release, 'Invalid release', 1, 100) != 0:
+        if verifyJsonValue(release, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid release', 403)
 
         if (year is None or year == "") or (year < 0) or (year > 2017):
@@ -94,3 +94,142 @@ def create():
     except Exception as e:
         print(e)
         return jsonResponse('Error', 'Server Error', 500)
+
+
+@app.route("/api/song/edit", methods=['PUT'])
+def editsong():
+    token = getToken()
+    path = getPath()
+    responses = []
+    # verify if token and path request are correct and check them in database
+    if token is None or token==1:
+        return jsonResponse('Error', 'Server Error', 500)
+
+    user = access(token)
+    if user is None:
+        return jsonResponse('Error', 'Invalid user', 403)
+
+    if path is None or path==1:
+        return jsonResponse('Error', 'Server Error', 500)
+
+    file = accessSong(path)
+    if file is None:
+        return jsonResponse('Error', 'Invalid file path', 403)
+
+    # verify if user token matches song owner token path
+    if user.id != file.user_id:
+        return jsonResponse('Error', 'You dont own this song', 403)
+
+    try:
+        title = request.json['title']
+
+        responses.append(edit_song_value('title', path, title))
+    except Exception as badTitle:
+        print(badTitle)
+    try:
+        artist = request.json['artist']
+
+        responses.append(edit_song_value('artist', path, artist))
+
+    except Exception as badArtist:
+        print(badArtist)
+    try:
+        album = request.json['album']
+
+        responses.append(edit_song_value('album', path, album))
+    except Exception as badAlbum:
+        print(badAlbum)
+
+    try:
+        release = request.json['release']
+
+        responses.append(edit_song_value('release', path, release))
+    except Exception as badRelease:
+        print(badRelease)
+
+    try:
+        year = request.json['year']
+
+        responses.append(edit_song_value('year', path, year))
+    except Exception as badYear:
+        print(badYear)
+
+        '''
+        in case of success the index is None, Not changed if the DB as the same value, and 403 forbidden in case of bad input
+        '''
+    print(responses)
+    # TODO if to change the response
+    response_data = {
+        'result': 'Success',
+        'message': 'Song updated successfully'
+    }
+
+    response = jsonify(response_data)
+    response.status_code = 200
+
+    return response
+
+
+def edit_song_value(type, path, value):
+    if value == "" or value is None:
+        return
+    try:
+        session = create_session()
+        song = accessSong(path)
+        if type == 'title':
+            if song.title == value:
+                return "Not changed"
+            if len(value) < 6 or len(value) > 100:
+
+                return jsonResponse('Error', 'Insert a valid title (more than 6 characters and less than 100)', 403)
+        if type == 'artist':
+            if song.artist == value:
+                return "Not changed"
+            if len(value) < 6 or len(value) > 100:
+
+                return jsonResponse('Error', 'Insert a valid artist (more than 6 characters and less than 100)', 403)
+        if type == 'album':
+            if song.album == value:
+                return "Not changed"
+            if len(value) < 6 or len(value) > 100:
+
+                return jsonResponse('Error', 'Insert a valid album (more than 6 characters and less than 100)', 403)
+        if type == 'release':
+            if song.release == value:
+                return "Not changed"
+            if len(value) < 6 or len(value) > 100:
+
+                return jsonResponse('Error', 'Insert a valid release (more than 6 characters and less than 100)', 403)
+
+        if type == 'year':
+            try:
+                value = int(value)
+            except (ValueError, TypeError):
+                return jsonResponse('Error', 'Invalid year', 403)
+            if song.year == value:
+                return "Not changed"
+            if value < 0 or value > 2017:
+
+                return jsonResponse('Error', 'Insert a valid year 0<y<2018', 403)
+
+        session.query(Song).filter(Song.path == path).update({type: value})
+        session.commit()
+        session.close()
+
+    except Exception as e:
+        return e
+
+
+def getPath():
+    try:
+        return request.json['path']
+    except Exception:
+        return 1
+
+
+# verify path returns song with that path
+def accessSong(path):
+    session = create_session()
+    song = session.query(Song).filter_by(path=path).first()
+    session.close()
+    return song
