@@ -44,7 +44,6 @@ def createsong():
         else:
             return jsonResponse('Error', 'No file', 403)
 
-
         session = create_session()
 
         song = session.query(Song).filter(Song.path == path).first()
@@ -97,19 +96,19 @@ def editsong():
     token = getToken()
     path = getPath()
     responses = []
-    type = ["title", "artist", "album","year"]
+    type = ["title", "artist", "album", "year"]
     error = ""
     notchanged = ""
     changed = ""
     # verify if token and path request are correct and check them in database
-    if token is None or token==1:
+    if token is None or token == 1:
         return jsonResponse('Error', 'Server Error', 500)
 
     user = access(token)
     if user is None:
         return jsonResponse('Error', 'Invalid user', 403)
 
-    if path is None or path==1:
+    if path is None or path == 1:
         return jsonResponse('Error', 'Server Error', 500)
 
     file = accessSong(path)
@@ -148,19 +147,20 @@ def editsong():
         print(badYear)
 
         '''
-        in case of success the index is None, Not changed if the DB as the same value, and 403 forbidden in case of bad input
+        in case of success the index is None, Not changed if the DB as the same value,
+         and 403 forbidden in case of bad input
         '''
     print(responses)
-    if (all(item == 'Not changed' for item in responses)):
+    if all(item == 'Not changed' for item in responses):
         return jsonResponse('Error', 'everything already up-to-date', 403)
 
-    if (all(item == None for item in responses)):
+    if all(item is None for item in responses):
         return jsonResponse('Success', 'Everything changed', 200)
 
-    if not None in responses and not "Not changed" in responses:
+    if None not in responses and "Not changed" not in responses:
         return jsonResponse('Error', 'Nothing changed bad email, password and name', 403)
 
-    if not None in responses and "Not changed" in responses:
+    if None not in responses and "Not changed" in responses:
         for i, j in enumerate(responses):
             if j != "Not changed":
                 error += " " + type[i]
@@ -238,7 +238,7 @@ def list_songs_from_user():
 
         songs = session.query(Song).filter(Song.user_id == user.id).all()
 
-        if songs is not None:
+        if songs:
             songs = [song.serialize() for song in songs]
 
             response_data = {
@@ -251,14 +251,43 @@ def list_songs_from_user():
             response.status_code = 200
             session.close()
             return response
-        else:
+        if not songs:
             return jsonResponse('Success', 'Users has no songs', 200)
 
+    except Exception as e:
+        print(e)
+        return jsonResponse('Error', 'Server Error', 500)
 
 
+@app.route("/api/song/listall", methods=['GET'])
+def list_all_songs():
+    try:
+        token = request.json['token']
+        user = access(token)
 
+        if user is None or user == "":
+            return jsonResponse('Error', 'Invalid user', 403)
 
-        session.close()
+        session = create_session()
+
+        songs = session.query(Song).all()
+
+        if songs:
+            songs = [song.serialize() for song in songs]
+
+            response_data = {
+                'result': 'Success',
+                'message': 'Playlist retrieved successfuly',
+                'songs': songs
+            }
+
+            response = jsonify(response_data)
+            response.status_code = 200
+            session.close()
+            return response
+        if not songs:
+            return jsonResponse('Success', 'Users has no songs', 200)
+
     except Exception as e:
         print(e)
         return jsonResponse('Error', 'Server Error', 500)
