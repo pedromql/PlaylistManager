@@ -51,6 +51,13 @@ class Playlist(Base):
 	def __repr__(self):
 		return "<Playlist(name='%s', id='%s'>" % (self.name, self.id)
 
+	def serialize(self):
+		return {
+			'name': self.name, 
+			'date': self.date,
+			'size': len(self.songs)
+		}
+
 class Song(Base):
 	__tablename__ = 'song'
 	id = Column(Integer, primary_key=True)
