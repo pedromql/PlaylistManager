@@ -12,7 +12,6 @@ def createsong():
         title = request.form['title']
         artist = request.form['artist']
         album = request.form['album']
-        release = request.form['release']
         year = request.form['year']
 
         try:
@@ -36,9 +35,6 @@ def createsong():
 
         if verifyJsonValue(album, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid album', 403)
-
-        if verifyJsonValue(release, 1, 100) != 0:
-            return jsonResponse('Error', 'Invalid release', 403)
 
         if (year is None or year == "") or (year < 0) or (year > 2017):
             return jsonResponse('Error', 'Invalid year', 403)
@@ -141,13 +137,6 @@ def editsong():
         print(badAlbum)
 
     try:
-        release = request.json['release']
-
-        responses.append(edit_song_value('release', path, release))
-    except Exception as badRelease:
-        print(badRelease)
-
-    try:
         year = request.json['year']
 
         responses.append(edit_song_value('year', path, year))
@@ -194,12 +183,6 @@ def edit_song_value(type, path, value):
             if len(value) < 6 or len(value) > 100:
 
                 return jsonResponse('Error', 'Insert a valid album (more than 6 characters and less than 100)', 403)
-        if type == 'release':
-            if song.release == value:
-                return "Not changed"
-            if len(value) < 6 or len(value) > 100:
-
-                return jsonResponse('Error', 'Insert a valid release (more than 6 characters and less than 100)', 403)
 
         if type == 'year':
             try:
