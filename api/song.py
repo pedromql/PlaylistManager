@@ -22,7 +22,7 @@ def createsong():
         user = access(token)
 
         if user is None or user == "":
-            return verifyJsonValue(user, 1, 100)
+            return jsonResponse('Error', 'Invalid user', 403)
 
         if verifyJsonValue(path, 1, 200) != 0:
             return jsonResponse('Error', 'Invalid path', 403)
@@ -223,6 +223,45 @@ def edit_song_value(type, path, value):
 
     except Exception as e:
         return e
+
+
+@app.route("/api/song/list", methods=['GET'])
+def list_songs_from_user():
+    try:
+        token = request.json['token']
+        user = access(token)
+
+        if user is None or user == "":
+            return jsonResponse('Error', 'Invalid user', 403)
+
+        session = create_session()
+
+        songs = session.query(Song).filter(Song.user_id == user.id).all()
+
+        if songs is not None:
+            songs = [song.serialize() for song in songs]
+
+            response_data = {
+                'result': 'Success',
+                'message': 'Playlist retrieved successfuly',
+                'songs': songs
+            }
+
+            response = jsonify(response_data)
+            response.status_code = 200
+            session.close()
+            return response
+        else:
+            return jsonResponse('Success', 'Users has no songs', 200)
+
+
+
+
+
+        session.close()
+    except Exception as e:
+        print(e)
+        return jsonResponse('Error', 'Server Error', 500)
 
 
 def getPath():
