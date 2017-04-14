@@ -74,6 +74,15 @@ class Song(Base):
 	def __repr__(self):
 		return "<Song(title='%s', artist='%s', album='%s', year='%s', path='%s', id='%s'>" % (self.title, self.artist, self.album, self.year, self.path, self.id)
 
+	def serialize(self):
+		return {
+			'title': self.title, 
+			'artist': self.artist,
+			'album': self.album,
+			'year': self.year,
+			'id': self.id
+		}
+
 
 User.songs = relationship("Song", order_by=Song.id, back_populates="user")
 

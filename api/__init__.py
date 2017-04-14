@@ -9,7 +9,7 @@ user_password = "root:root"
 
 application = app = Flask(__name__)
 
-UPLOAD_FOLDER = '/home/work/Music'
+UPLOAD_FOLDER = '/home/pedromql/Music'
 ALLOWED_EXTENSIONS = set(['mp3'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
