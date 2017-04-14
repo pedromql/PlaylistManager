@@ -18,7 +18,7 @@ def list_playlists():
 			response_data = {
 				'result' : 'Success',
 				'message' : 'Playlists retrieved successfuly',
-				'songs' : playlists
+				'playlists' : playlists
 			}
 
 			response = jsonify(response_data)
@@ -54,7 +54,7 @@ def list_playlists():
 		return response	
 
 
-@app.route("/api/playlist", methods=['GET','POST','PUT'])
+@app.route("/api/playlist", methods=['DELETE','GET','POST','PUT'])
 def playlist():
 	if request.method == 'GET':
 		return list_playlist_musics()
@@ -62,6 +62,8 @@ def playlist():
 		return create_playlist()
 	elif request.method == 'PUT':
 		return edit_playlist()
+	elif request.method == 'DELETE':
+		return delete_playlist()
 	else:
 		pass
 
@@ -233,6 +235,88 @@ def edit_playlist():
 				response = jsonify(response_data)
 				response.status_code = 200
 
+				return response
+
+			#if token does not correspond with the playlist creator
+			else:
+				session.close()
+
+				response_data = {
+					'result' : 'Error',
+					'message' : 'Playlist does not belong to the user'
+				}
+
+				response = jsonify(response_data)
+				response.status_code = 403
+
+				return response
+				
+		#if token does not correspond to a user          
+		elif user is None:
+			session.close()
+
+			response_data = {
+				'result' : 'Error',
+				'message' : 'Invalid Token'
+			}
+
+			response = jsonify(response_data)
+			response.status_code = 401
+
+			return response
+		#if token is valid but the playlist does not exist
+		else:
+			session.close()
+
+			response_data = {
+				'result' : 'Error',
+				'message' : 'Playlist does not exist'
+			}
+
+			response = jsonify(response_data)
+			response.status_code = 403
+
+			return response
+
+
+	except Exception as e:
+		print(e)
+		response_data = {
+				'result' : 'Error',
+				'message' : 'Server Error'
+		}
+
+		response = jsonify(response_data)
+		response.status_code = 500
+
+		return response
+
+def delete_playlist():
+	try:
+
+		id = request.json['id']
+		token = request.json['token']
+
+		session = create_session()
+
+		user = session.query(User).filter(User.token == token).first()
+		playlist = session.query(Playlist).filter(Playlist.id == id).first()
+		#if both the token and the playlist exist
+		if user is not None and playlist is not None:
+			#if token corresponds to the playlist creator
+			if playlist.user_id == user.id:
+				
+				session.delete(playlist)
+				session.commit()
+
+				response_data = {
+					'result' : 'Success',
+					'message' : 'Playlist deleted successfuly'
+				}
+
+				response = jsonify(response_data)
+				response.status_code = 200
+				session.close()
 				return response
 
 			#if token does not correspond with the playlist creator
