@@ -97,6 +97,10 @@ def editsong():
     token = getToken()
     path = getPath()
     responses = []
+    type = ["title", "artist", "album","year"]
+    error = ""
+    notchanged = ""
+    changed = ""
     # verify if token and path request are correct and check them in database
     if token is None or token==1:
         return jsonResponse('Error', 'Server Error', 500)
@@ -147,16 +151,34 @@ def editsong():
         in case of success the index is None, Not changed if the DB as the same value, and 403 forbidden in case of bad input
         '''
     print(responses)
-    # TODO if to change the response
-    response_data = {
-        'result': 'Success',
-        'message': 'Song updated successfully'
-    }
+    if (all(item == 'Not changed' for item in responses)):
+        return jsonResponse('Error', 'everything already up-to-date', 403)
 
-    response = jsonify(response_data)
-    response.status_code = 200
+    if (all(item == None for item in responses)):
+        return jsonResponse('Success', 'Everything changed', 200)
 
-    return response
+    if not None in responses and not "Not changed" in responses:
+        return jsonResponse('Error', 'Nothing changed bad email, password and name', 403)
+
+    if not None in responses and "Not changed" in responses:
+        for i, j in enumerate(responses):
+            if j != "Not changed":
+                error += " " + type[i]
+            else:
+                notchanged += " " + type[i]
+        return jsonResponse('Error', 'Nothing changed, already up-to-date: ' + notchanged + '| bad input: ' + error,
+                            403)
+
+    for i, j in enumerate(responses):
+        if j == "Not changed":
+            notchanged += " " + type[i]
+        elif j is None:
+            changed += " " + type[i]
+        else:
+            error += " " + type[i]
+    print("bem: " + notchanged + "mal: " + error)
+    return jsonResponse('Success',
+                        'Changed: ' + changed + '| already up-to-date: ' + notchanged + '| bad input: ' + error, 207)
 
 
 def edit_song_value(type, path, value):
