@@ -297,7 +297,6 @@ def search_songs():
             if i not in songs:
                 songs += i
 
-
         if songs:
             songs = [song.serialize() for song in songs]
 
