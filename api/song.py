@@ -272,7 +272,47 @@ def list_all_songs():
             session.close()
             return response
         if not songs:
-            return jsonResponse('Success', 'Users has no songs', 200)
+            return jsonResponse('Success', 'no songs to show', 200)
+
+    except Exception as e:
+        print(e)
+        return jsonResponse('Error', 'Server Error', 500)
+
+
+@app.route("/api/song/search", methods=['GET'])
+def search_songs():
+    try:
+        token = request.json['token']
+        keyword = request.json['keyword']
+        user = access(token)
+
+        if user is None or user == "":
+            return jsonResponse('Error', 'Invalid user', 403)
+
+        session = create_session()
+        songsartist = session.query(Song).filter(Song.artist.contains(keyword)).all()
+        songstitle = session.query(Song).filter(Song.title.contains(keyword)).all()
+        songs = songsartist
+        for i in songstitle:
+            if i not in songs:
+                songs += i
+
+
+        if songs:
+            songs = [song.serialize() for song in songs]
+
+            response_data = {
+                'result': 'Success',
+                'message': 'Playlist retrieved successfuly',
+                'songs': songs
+            }
+
+            response = jsonify(response_data)
+            response.status_code = 200
+            session.close()
+            return response
+        if not songs:
+            return jsonResponse('Success', 'no songs to show', 200)
 
     except Exception as e:
         print(e)
