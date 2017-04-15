@@ -80,7 +80,7 @@ def createsong():
 @app.route("/api/song/edit", methods=['PUT'])
 def editsong():
     token = getToken()
-    id = getId()
+    songid = getId()
     responses = []
     type = ["title", "artist", "album", "year"]
     error = ""
@@ -94,10 +94,10 @@ def editsong():
     if user is None:
         return jsonResponse('Error', 'Invalid user', 403)
 
-    if id is None or id == "nope":
+    if songid is None or songid == "nope":
         return jsonResponse('Error', 'Server Error', 500)
 
-    file = accessSong(id)
+    file = accessSong(songid)
     if file is None:
         return jsonResponse('Error', 'Invalid file id', 403)
 
@@ -108,27 +108,27 @@ def editsong():
     try:
         title = request.json['title']
 
-        responses.append(edit_song_value('title', id, title))
+        responses.append(edit_song_value('title', songid, title))
     except Exception as badTitle:
         print(badTitle)
     try:
         artist = request.json['artist']
 
-        responses.append(edit_song_value('artist', id, artist))
+        responses.append(edit_song_value('artist', songid, artist))
 
     except Exception as badArtist:
         print(badArtist)
     try:
         album = request.json['album']
 
-        responses.append(edit_song_value('album', id, album))
+        responses.append(edit_song_value('album', songid, album))
     except Exception as badAlbum:
         print(badAlbum)
 
     try:
         year = request.json['year']
 
-        responses.append(edit_song_value('year', id, year))
+        responses.append(edit_song_value('year', songid, year))
     except Exception as badYear:
         print(badYear)
 
@@ -229,7 +229,7 @@ def list_songs_from_user():
 
             response_data = {
                 'result': 'Success',
-                'message': 'Playlist retrieved successfuly',
+                'message': 'Playlist retrieved successfully',
                 'songs': songs
             }
 
@@ -263,7 +263,7 @@ def list_all_songs():
 
             response_data = {
                 'result': 'Success',
-                'message': 'Playlist retrieved successfuly',
+                'message': 'Playlist retrieved successfully',
                 'songs': songs
             }
 
@@ -302,7 +302,7 @@ def search_songs():
 
             response_data = {
                 'result': 'Success',
-                'message': 'Playlist retrieved successfuly',
+                'message': 'Playlist retrieved successfully',
                 'songs': songs
             }
 
@@ -312,6 +312,39 @@ def search_songs():
             return response
         if not songs:
             return jsonResponse('Success', 'no songs to show', 200)
+
+    except Exception as e:
+        print(e)
+        return jsonResponse('Error', 'Server Error', 500)
+
+
+@app.route("/api/song/delete", methods=['DELETE'])
+def delete_songs():
+    token = getToken()
+    songid = getId()
+    # verify if token and  request are correct and check them in database
+    if token is None or token == 1:
+        return jsonResponse('Error', 'Server Error', 500)
+
+    user = access(token)
+    if user is None:
+        return jsonResponse('Error', 'Invalid user', 403)
+
+    file = accessSong(songid)
+    if file is None:
+        return jsonResponse('Error', 'Invalid file id', 403)
+
+    # verify if user token matches song owner token id
+    if user.id != file.user_id:
+        return jsonResponse('Error', 'You dont own this song', 403)
+
+    try:
+        session = create_session()
+
+        session.query(Song).filter(Song.id == songid).update({'user_id': "1"})
+        session.commit()
+        session.close()
+        return jsonResponse('Sucess', 'Music Deleted', 200)
 
     except Exception as e:
         print(e)

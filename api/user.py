@@ -72,7 +72,7 @@ def create():
 
             response_data = {
                 'result': 'Success',
-                'message': 'User ' + name + ' created successfuly'
+                'message': 'User ' + name + ' created successfully'
             }
 
             response = jsonify(response_data)
