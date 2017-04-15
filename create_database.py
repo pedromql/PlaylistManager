@@ -3,7 +3,6 @@ import time, datetime
 from sqlalchemy import Table, Column, Integer, String, create_engine, Sequence, ForeignKey, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from api import create_session
 
 engine = create_engine('mysql+pymysql://root:root@localhost',echo=False)
 
@@ -98,12 +97,13 @@ User.playlists = relationship("Playlist", order_by=Playlist.id, back_populates="
 Base.metadata.create_all(engine)
 
 try:
-	session = create_session()
+	Session = sessionmaker(bind=engine)
+	session = Session()
 
 
-	user = session.query(User).filter(User.email == "delete").first()
+	user = session.query(User).filter(User.name == "delete").all()
 
-	if user is None:
+	if not user:
 		session.add(User(email="delete", password="delete", name="delete", token="delete"))
 		session.commit()
 	else:
