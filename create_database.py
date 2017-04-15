@@ -65,7 +65,6 @@ class Song(Base):
 	artist = Column(String(100))
 	album = Column(String(100))
 	year = Column(Integer)
-	path = Column(String(200))
 
 	user_id = Column(Integer, ForeignKey('user.id'))
 	user = relationship("User", back_populates="songs")
@@ -79,7 +78,7 @@ class Song(Base):
 	#DONE can have one User(uploader), can belong to several playlists
 
 	def __repr__(self):
-		return "<Song(title='%s', artist='%s', album='%s', year='%s', path='%s', id='%s'>" % (self.title, self.artist, self.album, self.year, self.path, self.id)
+		return "<Song(title='%s', artist='%s', album='%s', year='%s', id='%s'>" % (self.title, self.artist, self.album, self.year, self.id)
 
 	def serialize(self):
 		return {

@@ -8,7 +8,6 @@ from api import app, access, create_session, allowed_file, verifyJsonValue, json
 def createsong():
     try:
         token = request.form['token']
-        path = request.form['path']
         title = request.form['title']
         artist = request.form['artist']
         album = request.form['album']
@@ -23,9 +22,6 @@ def createsong():
 
         if user is None or user == "":
             return jsonResponse('Error', 'Invalid user', 403)
-
-        if verifyJsonValue(path, 1, 200) != 0:
-            return jsonResponse('Error', 'Invalid path', 403)
 
         if verifyJsonValue(title, 1, 100) != 0:
             return jsonResponse('Error', 'Invalid title', 403)
@@ -46,20 +42,14 @@ def createsong():
 
         session = create_session()
 
-        song = session.query(Song).filter(Song.path == path).first()
 
-        if song is None:
-            song = Song(title = title, artist = artist, album = album, year = year, path = path, user_id = user.id)
-            session.add(song)
-        else:
-            session.close()
-            return jsonResponse('Error', 'Song already exists', 403)
+        song = Song(title=title, artist=artist, album=album, year=year, user_id=user.id)
+        session.add(song)
+        session.flush()
 
-        directory = ""
-        for i in path.split('/')[:-1]:
-            directory += i + '/'
-        if not os.path.exists(app.config['UPLOAD_FOLDER'] + directory):
-            os.makedirs(app.config['UPLOAD_FOLDER'] + directory)
+
+        # session.refresh(song)
+        # print(song.id)
 
         if songfile and songfile.filename != '':
             old_file_position = songfile.tell()
@@ -73,13 +63,9 @@ def createsong():
             if not allowed_file(songfile.filename.lower()):
                 return jsonResponse('Error', 'Wrong file format', 403)
 
-            # if song exists remove the old one
-            if os.path.isfile(app.config['UPLOAD_FOLDER'] + path):
-                os.remove(app.config['UPLOAD_FOLDER'] + path)
-
             if allowed_file(songfile.filename.lower()):
                 songfile.filename = artist + "-" + title
-                songfile.save(app.config['UPLOAD_FOLDER'] + path)
+                songfile.save(app.config['UPLOAD_FOLDER'] +'/'+ str(song.id) + '.mp3')
 
         session.commit()
         session.close()
@@ -94,13 +80,13 @@ def createsong():
 @app.route("/api/song/edit", methods=['PUT'])
 def editsong():
     token = getToken()
-    path = getPath()
+    id = getId()
     responses = []
     type = ["title", "artist", "album", "year"]
     error = ""
     notchanged = ""
     changed = ""
-    # verify if token and path request are correct and check them in database
+    # verify if token and  request are correct and check them in database
     if token is None or token == 1:
         return jsonResponse('Error', 'Server Error', 500)
 
@@ -108,41 +94,41 @@ def editsong():
     if user is None:
         return jsonResponse('Error', 'Invalid user', 403)
 
-    if path is None or path == 1:
+    if id is None or id == "nope":
         return jsonResponse('Error', 'Server Error', 500)
 
-    file = accessSong(path)
+    file = accessSong(id)
     if file is None:
-        return jsonResponse('Error', 'Invalid file path', 403)
+        return jsonResponse('Error', 'Invalid file id', 403)
 
-    # verify if user token matches song owner token path
+    # verify if user token matches song owner token id
     if user.id != file.user_id:
         return jsonResponse('Error', 'You dont own this song', 403)
 
     try:
         title = request.json['title']
 
-        responses.append(edit_song_value('title', path, title))
+        responses.append(edit_song_value('title', id, title))
     except Exception as badTitle:
         print(badTitle)
     try:
         artist = request.json['artist']
 
-        responses.append(edit_song_value('artist', path, artist))
+        responses.append(edit_song_value('artist', id, artist))
 
     except Exception as badArtist:
         print(badArtist)
     try:
         album = request.json['album']
 
-        responses.append(edit_song_value('album', path, album))
+        responses.append(edit_song_value('album', id, album))
     except Exception as badAlbum:
         print(badAlbum)
 
     try:
         year = request.json['year']
 
-        responses.append(edit_song_value('year', path, year))
+        responses.append(edit_song_value('year', id, year))
     except Exception as badYear:
         print(badYear)
 
@@ -166,7 +152,7 @@ def editsong():
                 error += " " + type[i]
             else:
                 notchanged += " " + type[i]
-        return jsonResponse('Error', 'Nothing changed, already up-to-date: ' + notchanged + '| bad input: ' + error,
+        return jsonResponse('Error', 'Nothing changed, already up-to-date: ' + notchanged + ' |bad input: ' + error,
                             403)
 
     for i, j in enumerate(responses):
@@ -178,15 +164,15 @@ def editsong():
             error += " " + type[i]
     print("bem: " + notchanged + "mal: " + error)
     return jsonResponse('Success',
-                        'Changed: ' + changed + '| already up-to-date: ' + notchanged + '| bad input: ' + error, 207)
+                        'Changed: ' + changed + ' |already up-to-date: ' + notchanged + ' |bad input: ' + error, 207)
 
 
-def edit_song_value(type, path, value):
+def edit_song_value(type, id, value):
     if value == "" or value is None:
-        return
+        return jsonResponse('Error', 'Insert a valid input (more than 6 characters and less than 100)', 403)
     try:
         session = create_session()
-        song = accessSong(path)
+        song = accessSong(id)
         if type == 'title':
             if song.title == value:
                 return "Not changed"
@@ -217,7 +203,7 @@ def edit_song_value(type, path, value):
 
                 return jsonResponse('Error', 'Insert a valid year 0<y<2018', 403)
 
-        session.query(Song).filter(Song.path == path).update({type: value})
+        session.query(Song).filter(Song.id == id).update({type: value})
         session.commit()
         session.close()
 
@@ -293,16 +279,16 @@ def list_all_songs():
         return jsonResponse('Error', 'Server Error', 500)
 
 
-def getPath():
+def getId():
     try:
-        return request.json['path']
+        return request.json['id']
     except Exception:
-        return 1
+        return "nope"
 
 
-# verify path returns song with that path
-def accessSong(path):
+# verify id returns song with that id
+def accessSong(id):
     session = create_session()
-    song = session.query(Song).filter_by(path=path).first()
+    song = session.query(Song).filter_by(id=id).first()
     session.close()
     return song

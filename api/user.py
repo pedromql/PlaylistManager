@@ -177,7 +177,7 @@ def edit():
 
 def edit_value(type, token, value):
     if value == "" or value is None:
-        return
+        jsonResponse('Error', 'Insert a valid input', 403)
     try:
         session = create_session()
         user = access(token)

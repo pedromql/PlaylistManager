@@ -6,13 +6,11 @@ $( document ).ready(function() {
     	    form_data.append("file", $('#fileinput')[0].files[0]);
     	}
 
-    	form_data.append("token", "teste do crl");
-        form_data.append("title", "merda para isto");
-        form_data.append("path","/test/banan.mp3");
-        form_data.append("artist","banan player");
-        form_data.append("album","banan player");
-        form_data.append("release","banan player");
-        form_data.append("year","2000");
+    	form_data.append("token", "oVMN3iFYTjfJGGY3mVGKUeKvSbgwJMA1TU15c25Y7aUmBAjXEr");
+        form_data.append("title", "lost on you");
+        form_data.append("artist","lp");
+        form_data.append("album","lp");
+        form_data.append("year","2016");
 
 
         
@@ -22,7 +20,7 @@ $( document ).ready(function() {
     
     	$.ajax({
                 data: form_data,
-                url: "http://localhost:8080/api/song/upload",
+                url: "http://localhost:8080/api/song/create",
                 method: "POST",
                 contentType: false,
                 cache: false,
