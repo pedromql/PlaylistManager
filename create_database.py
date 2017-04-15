@@ -55,7 +55,8 @@ class Playlist(Base):
 		return {
 			'name': self.name, 
 			'date': self.date,
-			'size': len(self.songs)
+			'size': len(self.songs),
+			'id' : self.id
 		}
 
 class Song(Base):
@@ -92,7 +93,7 @@ class Song(Base):
 
 User.songs = relationship("Song", order_by=Song.id, back_populates="user")
 
-User.playlists = relationship("Playlist", order_by=Playlist.id, back_populates="user")
+User.playlists = relationship("Playlist", order_by=Playlist.id, back_populates="user", cascade="all, delete, delete-orphan")
 
 Base.metadata.create_all(engine)
 

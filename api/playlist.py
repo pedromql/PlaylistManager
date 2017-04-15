@@ -58,7 +58,7 @@ def list_playlists():
 def playlist():
 	if request.method == 'GET':
 		return list_playlist_musics()
-	elif request.method == 'ṔOST':
+	elif request.method == 'POST':
 		return create_playlist()
 	elif request.method == 'PUT':
 		return edit_playlist()
@@ -152,7 +152,6 @@ def list_playlist_musics():
 
 def create_playlist():
 	try:
-
 		name = request.json['name']
 		token = request.json['token']
 
@@ -193,7 +192,6 @@ def create_playlist():
 			response.status_code = 401
 
 			return response
-
 
 	except Exception as e:
 		print(e)
