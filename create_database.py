@@ -107,10 +107,7 @@ try:
 	if not user:
 		session.add(User(email="delete", password="delete", name="delete", token="delete"))
 		session.commit()
-	else:
-		print("ainda agora começou e já deu asneira sqn: delete já criado")
-
-
+	
 	session.close()
 except Exception as e:
 	print(e)
