@@ -89,3 +89,7 @@ ENV/
 .ropeproject
 
 .idea/
+api/static/bower_components/
+node_modules/
+api/static/scripts/js/
+api/static/scripts/jsx/

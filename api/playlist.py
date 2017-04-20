@@ -6,7 +6,7 @@ from create_database import  *
 def list_playlists():
 	try:
 
-		token = request.json['token']
+		token = request.args.get('token')
 
 		session = create_session()
 

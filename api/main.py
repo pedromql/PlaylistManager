@@ -17,7 +17,8 @@ def index():
 		# check if email/password combo
 		user = session.query(User).filter(User.token == token_cookie).first()
 		if user is not None:
-			return '<h1>welcome ' + token_cookie + '</h1><form action="/logout"><input type="submit" value="logout"/></form>'
+			return render_template('main.html')
+			#  return '<h1>welcome ' + token_cookie + '</h1><form action="/logout"><input type="submit" value="logout"/></form>'
 		else:
 			return render_template('index.html')
 
@@ -63,6 +64,7 @@ def register():
 			# set cookie and redirect for main page
 			resp = make_response(redirect('/'))
 			resp.set_cookie('token', token)
+			resp.set_cookie('name', name)
 
 			return resp
 
@@ -108,6 +110,7 @@ def login_static():
 
 			resp = make_response(redirect("/"))
 			resp.set_cookie('token', token)
+			resp.set_cookie('name', name)
 
 			return resp
 
@@ -126,4 +129,5 @@ def login_static():
 def logout():
 	resp = make_response(redirect('/'))
 	resp.set_cookie('token', '', expires=0)
+	resp.set_cookie('name', '', expires=0)
 	return resp

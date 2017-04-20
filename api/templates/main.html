@@ -1,7 +1,24 @@
+<!DOCTYPE html>
 <html>
-   <body>
-   
-      MAIN
-      
-   </body>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Flask React</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- styles -->
+	<!-- <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script> -->
+	<script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+</head>
+<body>
+	<div class="container">
+		<h1>Flask React</h1>
+		<br>
+		<div id="options"></div>
+		<div id="content"></div>
+	</div>
+	<!-- scripts -->
+	<script src="{{ url_for('static', filename='bower_components/react/react.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='bower_components/react/react-dom.min.js') }}"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+	<script type="text/jsx" src="{{ url_for('static', filename='main_script.js') }}"></script>
+</body>
 </html>
