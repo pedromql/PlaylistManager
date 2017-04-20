@@ -164,68 +164,122 @@ class Game extends React.Component {
 function Song(props) {
 	return (
 		<tr key={props.song.id}>
-			<td>{props.song.title}</td>
-			<td>{props.song.artist}</td>
-			<td>{props.song.album}</td>
-			<td>{props.song.year}</td>
-			<td>
-				<button onClick={() => this.deleteSong(props.song.id)}>Delete</button>
-			</td>
-			<td>
-				<button>Add to playlist</button>
-			</td>
+		<td>{props.song.title}</td>
+		<td>{props.song.artist}</td>
+		<td>{props.song.album}</td>
+		<td>{props.song.year}</td>
+		<td>
+		<button onClick={() => props.onClick()}>Delete</button>
+		</td>
+		<td>
+		<button>Add to playlist</button>
+		</td>
 		</tr>
-	);
+		);
 }
 
 class Songs extends React.Component {
-	render() {
-		var songs =[];
-		$.ajax({
-			async: false,
-			data: {
-				"token":readCookie('token')
-			},
-			dataType: 'json',
-			url: "/api/song/list",
-			method: "GET",
-			contentType: "application/json",
-			success: function(result) {
-				//result = JSON.parse(result);
-				console.log(result);
-				console.log(result.songs)
-				result.songs.forEach((song) => {
-					songs.push(<Song song={song} key={song.id} />);
-				});
-				//songs = result.songs;
-				console.log(songs);
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				console.log(XMLHttpRequest);
-				console.log(textStatus);
-				console.log(errorThrown);
-				//changeAlertBanner("alertBanner","Problemas na ligação ao servidor!", "", "warning");
+	constructor(props) {
+		super(props);
+		this.state = {
+			songs: null
+		};
+	}
+	renderSong(i) {
+		const songs = this.props.songs;
+		return <Song value={song[i]} onClick={() => this.props.onClick(i)} />;
+	}
+
+	componentDidMount() {
+		axios.get('/api/song/list', {
+			params: {
+				token: readCookie('token')
 			}
+		})
+		.then(response => {
+			var songs = [];
+			if (response.data.songs != null) {
+				response.data.songs.forEach((song) => {
+					songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
+				});
+			}
+			this.setState({ songs });
 		});
-		if (songs != null) {
-			return (
-				<table>
-				<thead>
-				<tr>
-				<th>Name</th>
-				<th>Artist</th>
-				<th>Album</th>
-				<th>Year</th>
-				</tr>
-				</thead>
-					<tbody>{songs}</tbody>
-				</table>
-				
+	}
+
+	// componentDidMount() {
+	// 	var songs =[];
+	// 	axios.get('/api/song/list', {
+	// 		params: {
+	// 			token: readCookie('token')
+	// 		}
+	// 	})
+	// 	.then(function (response) {
+	// 		console.log("axios");
+	// 		console.log(response);
+	// 		response.data.songs.forEach((song) => {
+	// 			songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
+	// 		});
+	// 		console.log(songs);
+	// 		this.setState({songs});
+	// 	})
+	// 	.catch(function (error) {
+	// 		console.log(error);
+	// 	});
+	// }
+	render() {
+		// $.ajax({
+		// 	async: false,
+		// 	data: {
+		// 		"token":readCookie('token')
+		// 	},
+		// 	dataType: 'json',
+		// 	url: "/api/song/list",
+		// 	method: "GET",
+		// 	contentType: "application/json",
+		// 	success: function(result) {
+		// 		//result = JSON.parse(result);
+		// 		console.log(result);
+		// 		console.log(result.songs)
+		// 		result.songs.forEach((song) => {
+		// 			songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
+		// 		});
+		// 		//songs = result.songs;
+		// 		console.log(songs);
+		// 	},
+		// 	error: function(XMLHttpRequest, textStatus, errorThrown) {
+		// 		console.log(XMLHttpRequest);
+		// 		console.log(textStatus);
+		// 		console.log(errorThrown);
+		// 		//changeAlertBanner("alertBanner","Problemas na ligação ao servidor!", "", "warning");
+		// 	}
+		// });
+		if (this.state.songs != null) {
+			if (this.state.songs.length > 0) {
+				return (
+					<table>
+					<thead>
+					<tr>
+					<th>Name</th>
+					<th>Artist</th>
+					<th>Album</th>
+					<th>Year</th>
+					</tr>
+					</thead>
+					<tbody>{this.state.songs}</tbody>
+					</table>
+
+					);
+			}
+			else {
+				return(
+				<li>No songs added yet.</li>
 				);
+			}
 		}
 		else {
 			return(
-				<li>No songs added yet!</li>
+				<li>Loading...</li>
 				);
 		}
 	}
@@ -288,9 +342,19 @@ class Playlists extends React.Component {
 }
 
 class Options extends React.Component {
+	constructor() {
+		super();
+		this.state = {};
+	}
+	mockSongs(songs) {
+		this.setState({
+			songs: ['song1','song2']
+		})
+	}
 	mySongs() {
+		const songs = this.state.songs;
 		ReactDOM.render(
-			<Songs />,
+			<Songs songs={songs} onClick={(i) => this.mockSongs(i)}/>,
 			document.getElementById('content')
 			);
 	}
