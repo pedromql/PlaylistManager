@@ -21,21 +21,14 @@ paths:
     post:
       operationId: create
       parameters:
-        - name: name
-          in: query
-          description: The user name
+        - in: body
+          name: body
+          description: >-
+            To create an user it's necessary a valid, unused username, valid
+            password and an email
           required: true
-          type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: true
-          type: string
-        - name: email
-          in: query
-          description: The email for login in clear text
-          required: true
-          type: string
+          schema:
+            $ref: '#/definitions/createuser'
       responses:
         '200':
           description: Created user successfully
@@ -52,26 +45,33 @@ paths:
     put:
       operationId: edit
       parameters:
-        - name: token
-          in: query
-          description: The user's identification token
+        - in: body
+          name: body
+          description: >-
+            To edit an user it's necessary a valid user token, any other parameter is opcional
           required: true
-          type: string
-        - name: name
-          in: query
-          description: The user name for login
-          required: false
-          type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          type: string
-        - name: email
-          in: query
-          description: The email for login in clear text
-          required: false
-          type: string
+          schema:
+            $ref: '#/definitions/edituser'
+       # - name: token
+       #   in: query
+       #   description: The user's identification token
+       #   required: true
+      #    type: string
+      #  - name: name
+       #   in: query
+        #  description: The user name for login
+        #  required: false
+      #    type: string
+      #  - name: password
+      #    in: query
+      #    description: The password for login in clear text
+      #    required: false
+      #    type: string
+      #  - name: email
+      #    in: query
+      #    description: The email for login in clear text
+      #    required: false
+      #    type: string
       responses:
         '200':
           description: Every parameter changed
@@ -88,16 +88,23 @@ paths:
     post:
       operationId: login
       parameters:
-        - name: password
-          in: query
-          description: The password for login in clear text
+        - in: body
+          name: body
+          description: >-
+            To login it's necessary to have an user created in the system and use a valid password and valid email
           required: true
-          type: string
-        - name: email
-          in: query
-          description: The email for login in clear text
-          required: true
-          type: string
+          schema:
+            $ref: '#/definitions/login'
+       # - name: password
+       #   in: query
+      #    description: The password for login in clear text
+      #    required: true
+      #    type: string
+      #  - name: email
+      #    in: query
+      #    description: The email for login in clear text
+      #    required: true
+      #    type: string
       responses:
         '200':
           description: Login Successful
@@ -179,36 +186,43 @@ paths:
     put:
       operationId: editsong
       parameters:
-        - name: token
-          in: query
-          description: The user's identification token
+        - in: body
+          name: body
+          description: >-
+            To edit a Song it's necessary to use a valid token and song id all other parameters are optional
           required: true
-          type: string
-        - name: id
-          in: query
-          description: The song's identification id
-          required: true
-          type: string
-        - name: title
-          in: query
-          description: Song's title
-          required: false
-          type: string
-        - name: artist
-          in: query
-          description: Song's artist
-          required: false
-          type: string
-        - name: album
-          in: query
-          description: Song's album
-          required: false
-          type: string
-        - name: year
-          in: query
-          description: Song's year
-          required: false
-          type: string
+          schema:
+            $ref: '#/definitions/editsong'
+     #   - name: token
+    #      in: query
+     #     description: The user's identification token
+    #      required: true
+    #      type: string
+    #    - name: id
+    #      in: query
+    #      description: The song's identification id
+    #      required: true
+    #      type: string
+    #    - name: title
+    #      in: query
+    #      description: Song's title
+    #      required: false
+    #      type: string
+    #    - name: artist
+    #      in: query
+    #      description: Song's artist
+    #      required: false
+    #      type: string
+    #    - name: album
+    #      in: query
+    #      description: Song's album
+    #      required: false
+    #      type: string
+    #    - name: year
+     #     in: query
+    #      description: Song's year
+    #      required: false
+    #      type: string
       responses:
         '200':
           description: Every parameter changed
@@ -353,16 +367,23 @@ paths:
     post:
       operationId: create_playlist
       parameters:
-        - name: token
-          in: query
-          description: The user's identification token
+        - in: body
+          name: body
+          description: >-
+            To create a playlist it's necessary to have a valid token and a name for the playlist
           required: true
-          type: string
-        - name: name
-          in: query
-          description: The song's name
-          required: true
-          type: string
+          schema:
+            $ref: '#/definitions/createplaylist'
+    #    - name: token
+    #      in: query
+    #      description: The user's identification token
+    #      required: true
+    #      type: string
+    #    - name: name
+    #      in: query
+    #      description: The song's name
+    #      required: true
+    #      type: string
       responses:
         '200':
           description: Playlist created successfully
@@ -376,21 +397,28 @@ paths:
     put:
       operationId: edit_playlist
       parameters:
-        - name: token
-          in: query
-          description: The user's identification token
+        - in: body
+          name: body
+          description: >-
+            To edit a playlist it's necessary to have a valid token, playlist id and a name for the playlist
           required: true
-          type: string
-        - name: id
-          in: query
-          description: The playlist's identification id
-          required: true
-          type: string
-        - name: name
-          in: query
-          description: The song's name
-          required: true
-          type: string
+          schema:
+            $ref: '#/definitions/editplaylist'
+     #   - name: token
+     #     in: query
+    #      description: The user's identification token
+     #     required: true
+    #      type: string
+    #    - name: id
+    #      in: query
+    #      description: The playlist's identification id
+    #      required: true
+    #      type: string
+    #    - name: name
+    #      in: query
+    #      description: The song's name
+    #      required: true
+    #      type: string
       responses:
         '200':
           description: Playlist edited successfully
@@ -440,7 +468,7 @@ paths:
           type: string
         - name: song
           in: query
-          description: Song to remove to playlist
+          description: Song to remove from the playlist
           required: true
           type: string
       responses:
@@ -460,23 +488,30 @@ paths:
     post:
       operationId: add_song_to_playlist
       parameters:
-        - name: token
-          in: query
-          description: The user's identification token
+        - in: body
+          name: body
+          description: >-
+            To add a song to a playlist it's necessary to have a valid token, playlist id and an array with the ids of the songs to upload to the playlist
           required: true
-          type: string
-        - name: id
-          in: query
-          description: The playlist's identification id
-          required: true
-          type: string
-        - name: songs
-          in: query
-          description: Songs to add to playlist
-          required: true
-          type: array
-          items:
-            type: string
+          schema:
+            $ref: '#/definitions/addsongtoplaylist'
+   #     - name: token
+   #       in: query
+  #        description: The user's identification token
+  #        required: true
+  #        type: string
+  #      - name: id
+  #        in: query
+  #        description: The playlist's identification id
+  #        required: true
+  #        type: string
+  #      - name: songs
+  #        in: query
+  #        description: Songs to add to playlist
+  #        required: true
+  #        type: array
+  #        items:
+  #          type: string
       responses:
         '200':
           description: Musics added to playlist successfully
@@ -543,108 +578,108 @@ definitions:
     xml:
       name: song
   createuser:
-    type: "object"
+    type: object
     required:
-    - "name"
-    - "password"
-    - "email"
+      - name
+      - password
+      - email
     properties:
       name:
-        type: "string"
-        format: "doggie"
+        type: string
+        format: doggie
       password:
-        type: "string"
-        example: "password"
+        type: string
+        example: password
       email:
-        type: "string"
-        example: "banan@banan.com"
+        type: string
+        example: banan@banan.com
     xml:
-      name: "createuser"
+      name: createuser
   edituser:
-    type: "object"
+    type: object
     required:
-    - "token"
-    properties:
-      token: 
-        type: "string"
-      name:
-        type: "string"
-        format: "doggie"
-      password:
-        type: "string"
-        example: "password"
-      email:
-        type: "string"
-        example: "banan@banan.com"
-    xml:
-      name: "editeuser"
-  login:
-    type: "object"
-    required:
-    - "password"
-    - "email"
-    properties:
-      password:
-        type: "string"
-        example: "password"
-      email:
-        type: "string"
-        example: "banan@banan.com"
-    xml:
-      name: "login"
-  editsong:
-    type: "object"
-    required:
-    - "token"
-    - "id"
+      - token
     properties:
       token:
-        type: "string"
+        type: string
+      name:
+        type: string
+        format: doggie
+      password:
+        type: string
+        example: password
+      email:
+        type: string
+        example: banan@banan.com
+    xml:
+      name: edituser
+  login:
+    type: object
+    required:
+      - password
+      - email
+    properties:
+      password:
+        type: string
+        example: password
+      email:
+        type: string
+        example: banan@banan.com
+    xml:
+      name: login
+  editsong:
+    type: object
+    required:
+      - token
+      - id
+    properties:
+      token:
+        type: string
       id:
         type: string
       password:
-        type: "string"
+        type: string
       title:
-        type: "string"
-        example: "city of stars"
+        type: string
+        example: city of stars
       artist:
-        type: "string"
-        example: "John Legend"
+        type: string
+        example: John Legend
       album:
-        type: "string"
-        example: "la la land"
+        type: string
+        example: la la land
       year:
-        type: "string"
-        example: "2016"
+        type: string
+        example: '2016'
     xml:
-      name: "editsong"
+      name: editsong
   createplaylist:
-    type: "object"
+    type: object
     required:
-    - "token"
-    - "name"
+      - token
+      - name
     properties:
       token:
-        type: "string"
+        type: string
       name:
-        type: "string"
+        type: string
     xml:
-      name: "createplaylist"
+      name: createplaylist
   editplaylist:
-    type: "object"
+    type: object
     required:
-    - "token"
-    - "id"
-    - "name"
+      - token
+      - id
+      - name
     properties:
       token:
-        type: "string"
+        type: string
       id:
-        type: "string"
+        type: string
       name:
-        type: "string"
+        type: string
     xml:
-      name: "editplaylist"
+      name: editplaylist
   addsongtoplaylist:
     type: object
     required:
@@ -662,4 +697,3 @@ definitions:
           type: string
     xml:
       name: addsongtoplaylist
-
