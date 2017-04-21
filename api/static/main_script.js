@@ -47,29 +47,42 @@ class AddSong extends React.Component {
 	}
 
 	handleChange(event) {
-		this.setState({name: event.target.value});
+		// this.setState({name: event.target.value});
 
 		const target = event.target;
-		const value = target.type === 'checkbox' ? target.checked : target.value;
 		const name = target.name;
 
 		this.setState({
-			[name]: value
+			[name]: target.value
 		});
 	}
 
 	handleSubmit(event) {
-		console.log(this.state.name);
-		axios.post('/api/playlist', {
-			token: readCookie('token'),
-			name: this.state.name
+		var data = new FormData();
+		data.append('title', this.state.title);
+		data.append('artist', this.state.artist);
+		data.append('album', this.state.album);
+		data.append('year', this.state.year);
+		data.append('token', readCookie('token'));
+		data.append('file', document.getElementById('file').files[0]);
+		var config = {
+			onUploadProgress: function(progressEvent) {
+				var percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+			},
+			headers: {'Content-Type': 'multipart/form-data'}
+		};
+		axios.post('/api/song/create', data, config)
+		.then(function (res) {
+			alert("PORREIRO PA!");
+			this.setState({
+				title: "",
+				artist: "",
+				album: "",
+				year: ""
+			});
 		})
-		.then(response => {
-			alert("Playlist criada");
-			console.log("Actualizado no servidor.");
-			console.log(response);
-			this.setState({name: ""});
-			this.forceUpdate();
+		.catch(function (err) {
+			alert("UPS!");
 		});
 		event.preventDefault();
 	}
@@ -96,7 +109,7 @@ class AddSong extends React.Component {
 			</label><br/>
 			<label>
 			File:
-			<input type="file" value={this.state.file} onChange={this.handleChange}/>
+			<input type="file" name="file" id="file"/>
 			</label><br/>
 			<input type="submit" value="Create"/>
 			</form>
