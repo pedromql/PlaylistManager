@@ -72,7 +72,7 @@ class AddSong extends React.Component {
 			headers: {'Content-Type': 'multipart/form-data'}
 		};
 		axios.post('/api/song/create', data, config)
-		.then(function (res) {
+		.then(response => {
 			alert("PORREIRO PA!");
 			this.setState({
 				title: "",
@@ -80,8 +80,10 @@ class AddSong extends React.Component {
 				album: "",
 				year: ""
 			});
+			$("#file").val('');
 		})
-		.catch(function (err) {
+		.catch(error => {
+			console.log(error);
 			alert("UPS!");
 		});
 		event.preventDefault();
