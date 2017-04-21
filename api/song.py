@@ -176,19 +176,19 @@ def edit_song_value(type, id, value):
 		if type == 'title':
 			if song.title == value:
 				return "Not changed"
-			if len(value) < 6 or len(value) > 100:
+			if len(value) < 1 or len(value) > 100:
 
 				return jsonResponse('Error', 'Insert a valid title (more than 6 characters and less than 100)', 403)
 		if type == 'artist':
 			if song.artist == value:
 				return "Not changed"
-			if len(value) < 6 or len(value) > 100:
+			if len(value) < 1 or len(value) > 100:
 
 				return jsonResponse('Error', 'Insert a valid artist (more than 6 characters and less than 100)', 403)
 		if type == 'album':
 			if song.album == value:
 				return "Not changed"
-			if len(value) < 6 or len(value) > 100:
+			if len(value) < 1 or len(value) > 100:
 
 				return jsonResponse('Error', 'Insert a valid album (more than 6 characters and less than 100)', 403)
 

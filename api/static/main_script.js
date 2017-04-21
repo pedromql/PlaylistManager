@@ -262,7 +262,6 @@ class AllSongs extends React.Component {
 				this.setState({ songs });
 				this.forceUpdate();
 			});
-			this.setState({ songs });
 		});
 		
 	}
@@ -307,22 +306,206 @@ class AllSongs extends React.Component {
 	}
 }
 
+class MySong extends React.Component {
+	constructor(props) {
+		super(props);
+		console.log("AQUI MANE");
+		console.log(props);
+		this.state = {
+			id: props.song.id,
+			playlists: props.playlists,
+			value: props.playlists[0].props.value,
+			title: [props.song.title, props.song.title],
+			artist: [props.song.artist, props.song.artist],
+			album: [props.song.album, props.song.album],
+			year: [props.song.year, props.song.year],
+			editable: "false"
+		};
 
-function Song(props) {
-	return (
-		<tr key={props.song.id}>
-		<td>{props.song.title}</td>
-		<td>{props.song.artist}</td>
-		<td>{props.song.album}</td>
-		<td>{props.song.year}</td>
-		<td>
-		<button onClick={() => props.onClick()}>Delete</button>
-		</td>
-		<td>
-		<button onClick={() => props.onClick()}>Add to playlist</button>
-		</td>
-		</tr>
-		);
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+		this.handleChangeEdit = this.handleChangeEdit.bind(this);
+		this.handleSubmitEdit = this.handleSubmitEdit.bind(this);
+	}
+
+	handleChange(event) {
+		this.setState({value: event.target.value});
+	}
+
+	handleSubmit(event) {
+		console.log(this.state.value);
+		var songs = [];
+		songs.push(this.props.song.id);
+		axios.post('/api/playlist/song', {
+			token: readCookie('token'),
+			id: this.state.value,
+			songs: songs
+		})
+		.then(response => {
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	handleChangeEdit(event) {
+		const target = event.target;
+		const name = target.name;
+		const original = this.state[name][1]
+		console.log(original);
+
+		this.setState({
+			[name]: [target.value, original]
+		});
+	}
+
+	handleSubmitEdit(event) {
+		console.log(this.state.value);
+		var songs = [];
+		songs.push(this.props.song.id);
+		axios.put('/api/song/edit', {
+			token: readCookie('token'),
+			id: this.state.id,
+			title: this.state.title[0],
+			artist: this.state.artist[0],
+			album: this.state.album[0],
+			year: this.state.year[0]
+		})
+		.then(response => {
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.setState({
+				editable: "false",
+				title: [this.state.title[0],this.state.title[0]],
+				artist: [this.state.artist[0],this.state.artist[0]],
+				album: [this.state.album[0],this.state.album[0]],
+				year: [this.state.year[0],this.state.year[0]]
+			});
+		})
+		.catch(error => {
+			console.log(error);
+		});
+		event.preventDefault();
+	}
+
+	onEdit() {
+		(this.state.editable == "false") ? this.setState({editable: "true"}) : this.setState({
+			editable: "false",
+			title: [this.state.title[1],this.state.title[1]],
+			artist: [this.state.artist[1],this.state.artist[1]],
+			album: [this.state.album[1],this.state.album[1]],
+			year: [this.state.year[1],this.state.year[1]]
+		});
+	}
+
+	render() {
+		if (this.state.editable == "false") {
+			return (
+				<tr key={this.props.song.id}>
+				<td>{this.state.title[0]}</td>
+				<td>{this.state.artist[0]}</td>
+				<td>{this.state.album[0]}</td>
+				<td>{this.state.year[0]}</td>
+				<td><button onClick={() => this.props.onClick()}>Delete</button></td>
+				<td><button onClick={() => this.onEdit()}>Edit</button></td>
+				<td>
+				<form onSubmit={this.handleSubmit}>
+				<select value={this.state.value} onChange={this.handleChange}>
+				{this.state.playlists}
+				</select>
+				<input type="submit" value="Add to playlist"/>
+				</form>
+				</td>
+				</tr>
+				);
+		}
+		else {
+			return (
+				<tr key={this.props.song.id}>
+				<form onSubmit={this.handleSubmitEdit}>
+				<td>
+				<input type="text" name="title" value={this.state.title[0]} onChange={this.handleChangeEdit}/>
+				</td>
+				<td>
+				<input type="text" name="artist" value={this.state.artist[0]} onChange={this.handleChangeEdit}/>
+				</td>
+				<td>
+				<input type="text" name="album" value={this.state.album[0]} onChange={this.handleChangeEdit}/>
+				</td>
+				<td>
+				<input type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
+				</td>
+				<input type="submit" hidden/></form>
+				<td><button onClick={() => this.props.onClick()}>Delete</button></td>
+				<td><button onClick={() => this.onEdit()}>Cancel Edit</button></td>
+				<td>
+				<form onSubmit={this.handleSubmit}>
+				<select value={this.state.value} onChange={this.handleChange}>
+				{this.state.playlists}
+				</select>
+				<input type="submit" value="Add to playlist"/>
+				</form>
+				</td>
+				</tr>
+				);
+		}
+	}
+}
+
+class Song extends React.Component {
+	constructor(props) {
+		super(props);
+		console.log("AQUI MANE");
+		console.log(props);
+		this.state = {
+			playlists: props.playlists,
+			value: props.playlists[0].props.value
+		};
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+	handleChange(event) {
+		this.setState({value: event.target.value});
+	}
+
+	handleSubmit(event) {
+		console.log(this.state.value);
+		var songs = [];
+		songs.push(this.props.song.id);
+		axios.post('/api/playlist/song', {
+			token: readCookie('token'),
+			id: this.state.value,
+			songs: songs
+		})
+		.then(response => {
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	render() {
+		return (
+			<tr key={this.props.song.id}>
+			<td>{this.props.song.title}</td>
+			<td>{this.props.song.artist}</td>
+			<td>{this.props.song.album}</td>
+			<td>{this.props.song.year}</td>
+			<td><button onClick={() => this.props.onClick()}>Delete</button></td>
+			<td>
+			<form onSubmit={this.handleSubmit}>
+			<select value={this.state.value} onChange={this.handleChange}>
+			{this.state.playlists}
+			</select>
+			<input type="submit" value="Add to playlist"/>
+			</form>
+			</td>
+			</tr>
+			);
+	}
 }
 
 class Songs extends React.Component {
@@ -382,6 +565,7 @@ class Songs extends React.Component {
 
 	componentDidMount() {
 		if (this.props.playlist == null) {
+
 			axios.get('/api/song/list', {
 				params: {
 					token: readCookie('token')
@@ -389,17 +573,34 @@ class Songs extends React.Component {
 			})
 			.then(response => {
 				var songs = [];
-				if (response.data.songs != null) {
-					response.data.songs.forEach((song) => {
-						songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-						console.log(this.props);
+				var playlists = [];
+				axios.get('/api/playlists', {
+					params: {
+						token: readCookie('token')
+					}
+				})
+				.then(response2 => {
+					response2.data.playlists.forEach((playlist) => {
+						playlists.push(<option value={playlist.id}>{playlist.name}</option>)
 					});
-				}
-				this.setState({ songs });
+					if (response.data.songs != null) {
+						response.data.songs.forEach((song) => {
+							songs.push(<MySong playlists={playlists} song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
+							console.log(this.props);
+						});
+					}
+					console.log(playlists)
+					console.log("acima");
+					this.setState({playlists});
+					this.setState({ songs });
+					this.forceUpdate();
+				});
+				
 			});
 		}
 		else {
 			var playlist_id = this.props.playlist.id;
+
 			axios.get('/api/playlist', {
 				params: {
 					token: readCookie('token'),
@@ -408,13 +609,29 @@ class Songs extends React.Component {
 			})
 			.then(response => {
 				var songs = [];
-				if (response.data.songs != null) {
-					response.data.songs.forEach((song) => {
-						songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-						console.log(this.props);
+				var playlists = [];
+				axios.get('/api/playlists', {
+					params: {
+						token: readCookie('token')
+					}
+				})
+				.then(response2 => {
+					response2.data.playlists.forEach((playlist) => {
+						playlists.push(<option value={playlist.id}>{playlist.name}</option>)
 					});
-				}
-				this.setState({ songs });
+					if (response.data.songs != null) {
+						response.data.songs.forEach((song) => {
+							songs.push(<Song playlists={playlists} song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
+							console.log(this.props);
+						});
+					}
+					console.log(playlists)
+					console.log("acima");
+					this.setState({playlists});
+					this.setState({ songs });
+					this.forceUpdate();
+				});
+				
 			});
 		}
 	}
@@ -428,7 +645,7 @@ class Songs extends React.Component {
 						<table>
 						<thead>
 						<tr>
-						<th>Name</th>
+						<th>Title</th>
 						<th>Artist</th>
 						<th>Album</th>
 						<th>Year</th>
@@ -466,7 +683,7 @@ class Songs extends React.Component {
 						<table>
 						<thead>
 						<tr>
-						<th>Name</th>
+						<th>Title</th>
 						<th>Artist</th>
 						<th>Album</th>
 						<th>Year</th>
@@ -781,7 +998,15 @@ class Playlists extends React.Component {
 				<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
 				<li><a href="#" onClick={() => this.createPlaylist()}>Create Playlist</a></li>
 				<li><a href="#" onClick={() => this.allMusic()}>All Music</a></li>
-				<li><a href="#" onClick={() => this.searchSongs()}>Search Music</a></li>
+				<li>
+					<form onSubmit={this.searchSongs()}>
+					<label>
+					Search Music
+					<input type="text" id="search"/>
+					</label>
+					<input type="submit" value="Search"/>
+					</form>
+				</li>
 				</ul>
 				);
 		}
