@@ -31,136 +31,6 @@ var realPython = React.createClass({
 }
 });
 
-function Square(props) {
-	$.ajax({
-		data: JSON.stringify({
-			"email":"teste@teste.teste",
-			"password":"testeteste"
-		}),
-		url: "/api/user/login",
-		method: "POST",
-		contentType: "application/json",
-		success: function(result) {
-				//result = JSON.parse(result);
-				console.log(result);
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				console.log(XMLHttpRequest);
-				console.log(textStatus);
-				console.log(errorThrown);
-				changeAlertBanner("alertBanner","Problemas na ligação ao servidor!", "", "warning");
-			}
-		});
-	return (
-		<button className="square" onClick={() => props.onClick()}>
-		{props.value}
-		</button>
-		);
-}
-
-class Board extends React.Component {
-	renderSquare(i) {
-		const squares = this.props.squares;
-		return <Square value={squares[i]} onClick={() => this.props.onClick(i)} />;
-	}
-	render() {
-		return (
-			<div>
-			<div className="board-row">
-			{this.renderSquare(0)}
-			{this.renderSquare(1)}
-			{this.renderSquare(2)}
-			</div>
-			<div className="board-row">
-			{this.renderSquare(3)}
-			{this.renderSquare(4)}
-			{this.renderSquare(5)}
-			</div>
-			<div className="board-row">
-			{this.renderSquare(6)}
-			{this.renderSquare(7)}
-			{this.renderSquare(8)}
-			</div>
-			</div>
-			);
-	}
-}
-
-class Game extends React.Component {
-	constructor() {
-		super();
-		this.state = {
-			history: [{
-				squares: Array(9).fill(null),
-			}],
-			stepNumber: 0,
-			xIsNext: true,
-		};
-	}
-	handleClick(i) {
-		var history = this.state.history.slice(0, this.state.stepNumber + 1);
-		var current = history[history.length - 1];
-		const squares = current.squares.slice();
-		if (calculateWinner(squares) || squares[i]) {
-			return;
-		}
-
-		squares[i] = this.state.xIsNext ? 'X' : 'O';
-
-		this.setState({
-			history: history.concat([{
-				squares: squares
-			}]),
-			stepNumber: history.length,
-			xIsNext: !this.state.xIsNext,
-		});
-	}
-	jumpTo(step) {
-		this.setState({
-			stepNumber: step,
-			xIsNext: (step % 2) ? false : true,
-		});
-	}
-	render() {
-		const history = this.state.history;
-		const current = history[this.state.stepNumber];
-
-		const winner = calculateWinner(current.squares);
-		let status;
-		if (winner) {
-			status = 'Winner: ' + winner;
-		} else {
-			status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-		}
-
-		const moves = history.map((step, move) => {
-			const desc = move ?
-			'Move #' + move :
-			'Game start';
-			return (
-				<li key={move}>
-				<a href="#" onClick={() => this.jumpTo(move)}>{desc}</a>
-				</li>
-				);
-		});
-
-		return (
-			<div className="game">
-			<div>
-			<Board
-			squares={current.squares}
-			onClick={(i) => this.handleClick(i)}
-			/>
-			</div>
-			<div className="game-info">
-			<div>{status}</div>
-			<ol>{moves}</ol>
-			</div>
-			</div>
-			);
-	}
-}
-
 function Song(props) {
 	return (
 		<tr key={props.song.id}>
@@ -172,7 +42,7 @@ function Song(props) {
 		<button onClick={() => props.onClick()}>Delete</button>
 		</td>
 		<td>
-		<button>Add to playlist</button>
+		<button onClick={() => props.onClick()}>Add to playlist</button>
 		</td>
 		</tr>
 		);
@@ -185,9 +55,27 @@ class Songs extends React.Component {
 			songs: null
 		};
 	}
-	renderSong(i) {
-		const songs = this.props.songs;
-		return <Song value={song[i]} onClick={() => this.props.onClick(i)} />;
+
+	delete(key) {
+		var songs = this.state.songs;
+		for (var i = 0; i < songs.length; i++) {
+			if (songs[i].key == key) {
+				axios.delete('/api/song/delete', {
+					params: {
+						token: readCookie('token'),
+						id: key
+					}
+				})
+				.then(response => {
+					console.log("Removido do servidor.");
+					console.log(response);
+					songs.splice(i, 1);
+					this.setState({songs})
+				});
+				
+				break;
+			}
+		}
 	}
 
 	componentDidMount() {
@@ -200,60 +88,15 @@ class Songs extends React.Component {
 			var songs = [];
 			if (response.data.songs != null) {
 				response.data.songs.forEach((song) => {
-					songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
+					songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
+					console.log(this.props);
 				});
 			}
 			this.setState({ songs });
 		});
 	}
-
-	// componentDidMount() {
-	// 	var songs =[];
-	// 	axios.get('/api/song/list', {
-	// 		params: {
-	// 			token: readCookie('token')
-	// 		}
-	// 	})
-	// 	.then(function (response) {
-	// 		console.log("axios");
-	// 		console.log(response);
-	// 		response.data.songs.forEach((song) => {
-	// 			songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
-	// 		});
-	// 		console.log(songs);
-	// 		this.setState({songs});
-	// 	})
-	// 	.catch(function (error) {
-	// 		console.log(error);
-	// 	});
-	// }
 	render() {
-		// $.ajax({
-		// 	async: false,
-		// 	data: {
-		// 		"token":readCookie('token')
-		// 	},
-		// 	dataType: 'json',
-		// 	url: "/api/song/list",
-		// 	method: "GET",
-		// 	contentType: "application/json",
-		// 	success: function(result) {
-		// 		//result = JSON.parse(result);
-		// 		console.log(result);
-		// 		console.log(result.songs)
-		// 		result.songs.forEach((song) => {
-		// 			songs.push(<Song song={song} key={song.id} value={song.id} onClick={() => this.props.onClick(song.id)} />);
-		// 		});
-		// 		//songs = result.songs;
-		// 		console.log(songs);
-		// 	},
-		// 	error: function(XMLHttpRequest, textStatus, errorThrown) {
-		// 		console.log(XMLHttpRequest);
-		// 		console.log(textStatus);
-		// 		console.log(errorThrown);
-		// 		//changeAlertBanner("alertBanner","Problemas na ligação ao servidor!", "", "warning");
-		// 	}
-		// });
+
 		if (this.state.songs != null) {
 			if (this.state.songs.length > 0) {
 				return (
@@ -273,8 +116,8 @@ class Songs extends React.Component {
 			}
 			else {
 				return(
-				<li>No songs added yet.</li>
-				);
+					<li>No songs added yet.</li>
+					);
 			}
 		}
 		else {
@@ -285,149 +128,278 @@ class Songs extends React.Component {
 	}
 }
 
-class Playlists extends React.Component {
-	render() {
-		var playlists;
-		$.ajax({
-			async: false,
-			data: {
-				"token":readCookie('token')
-			},
-			dataType: 'json',
-			url: "/api/playlists",
-			method: "GET",
-			contentType: "application/json",
-			success: function(result) {
-				//result = JSON.parse(result);
-				console.log(result);
-				console.log(result.playlists)
-				playlists = result.playlists;
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				console.log(XMLHttpRequest);
-				console.log(textStatus);
-				console.log(errorThrown);
-				//changeAlertBanner("alertBanner","Problemas na ligação ao servidor!", "", "warning");
-			}
+
+class Playlist extends React.Component {
+	constructor(props) {
+		super(props);
+		this.props.playlist.original = this.props.playlist.name;
+		this.state = {name: props.playlist.name};
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleChange(event) {
+		this.props.playlist.name = event.target.value;
+		this.setState({name: event.target.value});
+		console.log(event.target.value);
+	}
+
+	handleSubmit(event) {
+		axios.put('/api/playlist', {
+			token: readCookie('token'),
+			id: this.props.playlist.id,
+			name: this.props.playlist.name
+		})
+		.then(response => {
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.props.playlist.original = this.props.playlist.name;
+			delete this.props.editable;
+			this.forceUpdate();
 		});
-		if (playlists.length > 0) {
+		event.preventDefault();
+	}
+
+	render() {
+		if (this.props.editable != "true") {
 			return (
-				<table>
-				<thead>
-				<tr>
-				<th>Name</th>
-				<th>Size</th>
+				<tr key={this.props.playlist.id}>
+				<td>{this.props.playlist.name}</td>
+				<td>{this.props.playlist.size}</td>
+				<td>{this.props.playlist.date}</td>
+				<td>
+				<button onClick={() => this.props.onClick()}>Delete</button>
+				</td>
+				<td>
+				<button onClick={() => this.props.onUpdate()}>Modify playlist</button>
+				</td>
 				</tr>
-				</thead>
-				<tbody>
-				{
-					playlists.map(function(playlist) {
-						return( <tr key={playlist.id}> 
-							<td>{playlist.name}</td> 
-							<td>{playlist.size}</td> 
-							</tr>)
-					})
-				}
-				</tbody>
-				</table>
-				
 				);
 		}
 		else {
-			return(
-				<li>No playlists added yet!</li>
+			return (
+				<tr key={this.props.playlist.id}>
+				<td>
+				<form onSubmit={this.handleSubmit}>
+				<input type="text" value={this.props.playlist.name} onChange={this.handleChange}/>
+				<input type="submit" hidden/>
+				</form>
+				</td>
+				<td>{this.props.playlist.size}</td>
+				<td>{this.props.playlist.date}</td>
+				<td>
+				<button onClick={() => this.props.onClick()}>Delete</button>
+				</td>
+				<td>
+				<button onClick={() => this.props.onUpdate()}>Cancel modification</button>
+				</td>
+				</tr>
 				);
 		}
 	}
 }
 
-class Options extends React.Component {
-	constructor() {
-		super();
-		this.state = {};
+class Playlists extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			playlists: null,
+			name: 0,
+			size: 0,
+			date: 0
+		};
 	}
-	mockSongs(songs) {
-		this.setState({
-			songs: ['song1','song2']
-		})
-	}
-	mySongs() {
-		const songs = this.state.songs;
-		ReactDOM.render(
-			<Songs songs={songs} onClick={(i) => this.mockSongs(i)}/>,
-			document.getElementById('content')
-			);
-	}
-	myPlaylists() {
-		ReactDOM.render(
-			<Playlists />,
-			document.getElementById('content')
-			);
-	}
-	searchSongs() {
-		ReactDOM.render(
-			<Songs />,
-			document.getElementById('content')
-			);
-	}
-	render() {
-		return(
-			<ul>
-			<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
-			<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
-			<li><a href="#" onClick={() => this.searchSongs()}>Search Music</a></li>
-			</ul>
-			);
-	}
-}
 
-class SecondComponent extends React.Component {
-	render() {
-		const token = readCookie('token');
-		return(
-			<p>Your token is {token}</p>
-			);
-	}
-}
-
-class Welcome extends React.Component {
-	render() {
-		const name = readCookie('name');
-		return(
-			<div>
-			<h2>{name}'s playlists</h2>
-			<SecondComponent />
-			</div>
-			);
-	}
-}
-
-ReactDOM.render(
-	<Welcome />,
-	document.getElementById('content')
-	);
-
-ReactDOM.render(
-	<Options />,
-	document.getElementById('options')
-	);
-
-function calculateWinner(squares) {
-	const lines = [
-	[0, 1, 2],
-	[3, 4, 5],
-	[6, 7, 8],
-	[0, 3, 6],
-	[1, 4, 7],
-	[2, 5, 8],
-	[0, 4, 8],
-	[2, 4, 6],
-	];
-	for (let i = 0; i < lines.length; i++) {
-		const [a, b, c] = lines[i];
-		if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-			return squares[a];
+	delete(key) {
+		var playlists = this.state.playlists;
+		for (var i = 0; i < playlists.length; i++) {
+			if (playlists[i].key == key) {
+				axios.delete('/api/playlist', {
+					params: {
+						token: readCookie('token'),
+						id: key
+					}
+				})
+				.then(response => {
+					console.log("Removido do servidor.");
+					console.log(response);
+					playlists.splice(i, 1);
+					this.setState({playlists})
+				});
+				
+				break;
+			}
 		}
 	}
-	return null;
-}
+
+	change(key) {
+		console.log("mudando");
+	}
+
+	sort(which) {
+		var playlists = this.state.playlists;
+		if (this.state[which] == 0) {
+			playlists.sort(function(a,b) {
+				console.log(a);
+				return (a.props.playlist[which] < b.props.playlist[which]) ? 1 : ((b.props.playlist[which] > a.props.playlist[which]) ? -1 : 0);
+			});
+		}
+		else {
+			playlists.sort(function(a,b) {
+				console.log(a);
+				return (a.props.playlist[which] > b.props.playlist[which]) ? 1 : ((b.props.playlist[which] > a.props.playlist[which]) ? -1 : 0);
+			});
+		}
+		this.setState({ playlists }); 
+
+		if (which == "name") {
+			(this.state.name == 1) ? this.setState({ name:0}) : this.setState({ name:1});
+		}
+		else if (which == "size") {
+			(this.state.size == 1) ? this.setState({ size:0}) : this.setState({ size:1});
+		}
+		else {
+			(this.state.date == 1) ? this.setState({ date:0}) : this.setState({ date:1});
+		}
+	}
+
+	update(key) {
+		var playlists = this.state.playlists;
+		for (var i = 0; i < playlists.length; i++) {
+			if (playlists[i].key == key) {
+				var playlist = playlists[i].props.playlist;
+				playlist.name = playlist.original;
+				if (playlists[i].props.editable != "true") playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} editable="true" onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} />
+					else playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} />
+						this.setState({playlists})
+					break;
+				}
+			}
+		}
+
+		componentDidMount() {
+			axios.get('/api/playlists', {
+				params: {
+					token: readCookie('token')
+				}
+			})
+			.then(response => {
+				var playlists = [];
+				if (response.data.playlists != null) {
+					response.data.playlists.forEach((playlist) => {
+						playlists.push(<Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} />);
+						console.log(this.props);
+					});
+				// playlists.sort(function(a,b) {
+				// 	console.log(a);
+				// 	return (a.props.playlist.name < b.props.playlist.name) ? 1 : ((b.props.playlist.name > a.props.playlist.name) ? -1 : 0);
+				// } ); 
+
+			}
+			this.setState({ playlists });
+		});
+		}
+		render() {
+
+			if (this.state.playlists != null) {
+				if (this.state.playlists.length > 0) {
+					return (
+						<table>
+						<thead>
+						<tr>
+						<th onClick={() => this.sort("name")}>Name</th>
+						<th onClick={() => this.sort("size")}>Size</th>
+						<th onClick={() => this.sort("date")}>Date</th>
+						</tr>
+						</thead>
+						<tbody>{this.state.playlists}</tbody>
+						</table>
+
+						);
+				}
+				else {
+					return(
+						<li>No playlists added yet.</li>
+						);
+				}
+			}
+			else {
+				return(
+					<li>Loading...</li>
+					);
+			}
+		}
+	}
+
+	class Options extends React.Component {
+		constructor() {
+			super();
+			this.state = {};
+		}
+		delete() {
+			console.log("cona");
+		}
+		
+		mySongs() {
+			const songs = this.state.songs;
+			document.getElementById('content').innerHTML = '';
+			ReactDOM.render(
+				<Songs songs={songs} onClick={(i) => this.delete(i)}/>,
+				document.getElementById('content')
+				);
+		}
+		myPlaylists() {
+			document.getElementById('content').innerHTML = '';
+			ReactDOM.render(
+				<Playlists />,
+				document.getElementById('content')
+				);
+		}
+		searchSongs() {
+			ReactDOM.render(
+				<Songs />,
+				document.getElementById('content')
+				);
+		}
+		render() {
+			return(
+				<ul>
+				<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
+				<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
+				<li><a href="#" onClick={() => this.searchSongs()}>Search Music</a></li>
+				</ul>
+				);
+		}
+	}
+
+	class SecondComponent extends React.Component {
+		render() {
+			const token = readCookie('token');
+			return(
+				<p>Your token is {token}</p>
+				);
+		}
+	}
+
+	class Welcome extends React.Component {
+		render() {
+			const name = readCookie('name');
+			return(
+				<div>
+				<h2>{name}'s playlists</h2>
+				<SecondComponent />
+				</div>
+				);
+		}
+	}
+
+	ReactDOM.render(
+		<Welcome />,
+		document.getElementById('content')
+		);
+
+	ReactDOM.render(
+		<Options />,
+		document.getElementById('options')
+		);

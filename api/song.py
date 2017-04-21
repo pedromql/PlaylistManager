@@ -321,8 +321,8 @@ def search_songs():
 
 @app.route("/api/song/delete", methods=['DELETE'])
 def delete_songs():
-	token = getToken()
-	songid = getId()
+	token = request.args.get('token')
+	songid = request.args.get('id')
 	# verify if token and  request are correct and check them in database
 	if token is None or token == 1:
 		return jsonResponse('Error', 'Server Error', 500)

@@ -90,7 +90,7 @@ def create():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 403
+			response.status_code = 400
 
 			return response
 
@@ -309,7 +309,7 @@ def delete_user():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 

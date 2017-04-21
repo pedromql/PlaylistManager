@@ -37,7 +37,7 @@ def list_playlists():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 
@@ -120,7 +120,7 @@ def list_playlist_musics():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 		#if token is valid but the playlist does not exist
@@ -189,7 +189,7 @@ def create_playlist():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 
@@ -259,7 +259,7 @@ def edit_playlist():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 		#if token is valid but the playlist does not exist
@@ -292,8 +292,8 @@ def edit_playlist():
 def delete_playlist():
 	try:
 
-		id = request.json['id']
-		token = request.json['token']
+		id = request.args.get('id')
+		token = request.args.get('token')
 
 		session = create_session()
 
@@ -341,7 +341,7 @@ def delete_playlist():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 		#if token is valid but the playlist does not exist
@@ -469,7 +469,7 @@ def add_song_to_playlist(): #TODO could check if song is already in playlist
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 		#if token is valid but the playlist does not exist
@@ -589,7 +589,7 @@ def delete_song_from_playlist():
 			}
 
 			response = jsonify(response_data)
-			response.status_code = 401
+			response.status_code = 403
 
 			return response
 		#if token is valid but the playlist does not exist
