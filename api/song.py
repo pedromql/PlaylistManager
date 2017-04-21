@@ -249,7 +249,7 @@ def list_songs_from_user():
 @app.route("/api/song/listall", methods=['GET'])
 def list_all_songs():
 	try:
-		token = request.json['token']
+		token = request.args.get('token')
 		user = access(token)
 
 		if user is None or user == "":

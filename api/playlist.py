@@ -70,8 +70,8 @@ def playlist():
 def list_playlist_musics():
 	try:
 
-		id = request.json['id']
-		token = request.json['token']
+		id = request.args.get('id')
+		token = request.args.get('token')
 
 		session = create_session()
 
@@ -503,9 +503,9 @@ def add_song_to_playlist(): #TODO could check if song is already in playlist
 def delete_song_from_playlist():
 	try:
 
-		id = request.json['id']
-		songs = request.json['songs']
-		token = request.json['token']
+		id = request.args.get('id')
+		song = request.args.get('song')
+		token = request.args.get('token')
 
 		session = create_session()
 
@@ -515,55 +515,33 @@ def delete_song_from_playlist():
 		if user is not None and playlist is not None:
 			#if token corresponds to the playlist creator
 			if playlist.user_id == user.id:
-				success = []
-				fail = []
-				for song_id in songs:
-					
-					song = session.query(Song).filter(Song.id == song_id).first()
-					if song is not None and song in playlist.songs:
-						playlist.songs.remove(song)
-						success.append(song_id)
-					else:
-						fail.append(song_id)
-					
-					print(success)
-					print(fail)
+				song = session.query(Song).filter(Song.id == song).first()
+				if song is not None and song in playlist.songs:
+					playlist.songs.remove(song)
 
-				session.commit()
+					session.commit()
 
-				if len(success) > 0 and len(fail) == 0:
 					response_data = {
 						'result' : 'Success',
-						'success' : success,
-						'fail' : fail,
 						'message' : 'Songs removed from playlist'
 					}
 					response = jsonify(response_data)
 					response.status_code = 200
-					
-				elif len(success) > 0 and len(fail) > 0:
-					response_data = {
-						'result' : 'Partial Success',
-						'success' : success,
-						'fail' : fail,
-						'message' : 'Some songs removed from playlist'
-					}
-					response = jsonify(response_data)
-					response.status_code = 207
-					
+
+					session.close()
+
+					return response
 				else:
 					response_data = {
-						'result' : 'Error',
-						'success' : success,
-						'fail' : fail,
-						'message' : 'No songs removed from playlist'
+						'result': 'Error',
+						'message': 'Songs not in playlist'
 					}
 					response = jsonify(response_data)
-					response.status_code = 400
+					response.status_code = 403
 
-				session.close()
-				
-				return response
+					session.close()
+
+					return response
 
 			#if token does not correspond with the playlist creator
 			else:
