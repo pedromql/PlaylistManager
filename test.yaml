@@ -1,0 +1,501 @@
+info:
+  version: '1.0'
+  description: A Web application to manage multi-user music playlists.
+  title: Playlist mannager
+produces:
+  - application/json
+basePath: /api
+tags:
+  - name: user
+    description: Operations related to account
+  - name: playlist
+    description: Operations related to playlist
+  - name: song
+    description: Operations related to songs
+host: 'localhost:8080'
+swagger: '2.0'
+consumes:
+  - application/json
+paths:
+  /user/create:
+    post:
+      operationId: create
+      parameters:
+        - name: name
+          in: query
+          description: The user name
+          required: true
+          type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          type: string
+        - name: email
+          in: query
+          description: The email for login in clear text
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Created user successfully
+        '400':
+          description: Bad Request (User already exists)
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error
+      tags:
+        - user
+      summary: Create user
+  /user/edit:
+    put:
+      operationId: edit
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: name
+          in: query
+          description: The user name for login
+          required: false
+          type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          type: string
+        - name: email
+          in: query
+          description: The email for login in clear text
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Every parameter changed
+        '207':
+          description: Some parameters changed
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error (User doesn't exist)
+      tags:
+        - user
+      summary: Edit user
+  /user/login:
+    post:
+      operationId: login
+      parameters:
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          type: string
+        - name: email
+          in: query
+          description: The email for login in clear text
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Login Successful
+        '403':
+          description: Login Failed
+        '500':
+          description: Server Error
+      tags:
+        - user
+      summary: Login
+  /user/delete:
+    delete:
+      operationId: delete_user
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: User deleted successfully
+        '403':
+          description: Invalid token
+        '500':
+          description: Server Error
+      tags:
+        - user
+      summary: Delete user
+  /song/create:
+    post:
+      operationId: createsong
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: formData
+          description: The user's identification token
+          required: true
+          type: string
+        - name: title
+          in: formData
+          description: Song's title
+          required: true
+          type: string
+        - name: artist
+          in: formData
+          description: Song's artist
+          required: true
+          type: string
+        - name: album
+          in: formData
+          description: Song's album
+          required: true
+          type: string
+        - name: year
+          in: formData
+          description: Song's year
+          required: true
+          type: string
+        - name: file
+          in: formData
+          description: file to upload
+          required: true
+          type: file
+      responses:
+        '200':
+          description: Song uploaded
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error
+      tags:
+        - song
+      summary: Create song
+  /song/edit:
+    put:
+      operationId: editsong
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The song's identification id
+          required: true
+          type: string
+        - name: title
+          in: query
+          description: Song's title
+          required: false
+          type: string
+        - name: artist
+          in: query
+          description: Song's artist
+          required: false
+          type: string
+        - name: album
+          in: query
+          description: Song's album
+          required: false
+          type: string
+        - name: year
+          in: query
+          description: Song's year
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Every parameter changed
+        '207':
+          description: Some parameters changed
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error (Song doesn't exist)
+      tags:
+        - song
+      summary: Edit song
+  /song/list:
+    get:
+      operationId: list_songs_from_user
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Songs retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - song
+      summary: List all songs from user 
+  /song/listall:
+    get:
+      operationId: list_all_songs
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Songs retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - song
+      summary: List all songs 
+  /song/search:
+    get:
+      operationId: search_songs
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: keyword
+          in: query
+          description: Word to search in artists and titles  
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Songs retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - song
+      summary: List all songs with matching keyword 
+  /song/delete:
+    delete:
+      operationId: delete_songs
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The song's identification id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Songs deleted successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - song
+      summary: Deletes song 
+  /playlists:
+    get:
+      operationId: list_playlists
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Playlist retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - playlist
+      summary: List playlists from user
+  /playlist:
+    get:
+      operationId: list_playlist_musics
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The playlist's identification id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Musics from playlist retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - playlist
+      summary: List musics from playlist 
+    post:
+      operationId: create_playlist
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: name
+          in: query
+          description: The song's name
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Playlist created successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error 
+      tags:
+        - song
+      summary: Create playlist
+    put:
+      operationId: edit_playlist
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The playlist's identification id
+          required: true
+          type: string
+        - name: name
+          in: query
+          description: The song's name
+          required: true
+          type: string
+      responses:
+          '200':
+            description: Playlist edited successfully
+          '403':
+            description: Forbidden accesss
+          '500':
+            description: Server Error 
+      tags:
+        - playlist
+      summary: Edit playlist
+    delete:
+      operationId: delete_playlist
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The playlist's identification id
+          required: true
+          type: string
+      responses:
+          '200':
+            description: Playlist deleted successfully
+          '403':
+            description: Forbidden accesss
+          '500':
+            description: Server Error 
+      tags:
+        - playlist
+      summary: Delete playlist
+  /playlist/song:
+    delete:
+      operationId: delete_song_from_playlist
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The playlist's identification id
+          required: true
+          type: string
+        - name: songs
+          in: query
+          description: Songs to add to playlist
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+      responses:
+          '200':
+            description: Musics deleted from playlist successfully
+          '207':
+            description: Some musics deleted from playlist successfully
+          '400':
+            description: No Songs removed from playlist
+          '403':
+            description: Forbidden accesss
+          '500':
+            description: Server Error 
+      tags:
+        - playlist
+      summary: Delete playlist
+    post:
+      operationId: add_song_to_playlist
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The playlist's identification id
+          required: true
+          type: string
+        - name: songs
+          in: query
+          description: Songs to add to playlist
+          required: true
+          type: array
+          items: {
+            type: string
+          }
+      responses:
+          '200':
+            description: Musics added to playlist successfully
+          '207':
+            description: Some musics added to playlist successfully
+          '400':
+            description: No Songs added from playlist
+          '403':
+            description: Forbidden accesss
+          '500':
+            description: Server Error 
+      tags:
+        - playlist
+      summary: Delete playlist
+
+
+
+
