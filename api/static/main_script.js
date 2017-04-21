@@ -867,29 +867,33 @@ class Playlists extends React.Component {
 			if (playlists[i].key == key) {
 				var playlist = playlists[i].props.playlist;
 				playlist.name = playlist.original;
-				if (playlists[i].props.editable != "true") playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} editable="true" onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} onShow={() => this.props.show(playlist)} />
-					else playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} onShow={() => this.props.show(playlist)} />
-						this.setState({playlists})
-					break;
+				if (playlists[i].props.editable != "true") {
+					playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} editable="true" onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} onShow={() => this.props.show(playlist)} />
 				}
+				else {
+					playlists[i] = <Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onChange={() => this.change(playlist.id)} onShow={() => this.props.show(playlist)} />
+				}
+				this.setState({playlists});
+				break;
 			}
 		}
+	}
 
-		componentDidMount() {
-			axios.get('/api/playlists', {
-				params: {
-					token: readCookie('token')
-				}
-			})
-			.then(response => {
-				var playlists = [];
-				if (response.data.playlists != null) {
-					console.log("aqui");
+	componentDidMount() {
+		axios.get('/api/playlists', {
+			params: {
+				token: readCookie('token')
+			}
+		})
+		.then(response => {
+			var playlists = [];
+			if (response.data.playlists != null) {
+				console.log("aqui");
+				console.log(this.props);
+				response.data.playlists.forEach((playlist) => {
+					playlists.push(<Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onShow={() => this.props.show(playlist)}/>);
 					console.log(this.props);
-					response.data.playlists.forEach((playlist) => {
-						playlists.push(<Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onShow={() => this.props.show(playlist)}/>);
-						console.log(this.props);
-					});
+				});
 				// playlists.sort(function(a,b) {
 				// 	console.log(a);
 				// 	return (a.props.playlist.name < b.props.playlist.name) ? 1 : ((b.props.playlist.name > a.props.playlist.name) ? -1 : 0);
@@ -898,147 +902,236 @@ class Playlists extends React.Component {
 			}
 			this.setState({ playlists });
 		});
-		}
-		render() {
+	}
+	render() {
 
-			if (this.state.playlists != null) {
-				if (this.state.playlists.length > 0) {
-					return (
-						<table>
-						<thead>
-						<tr>
-						<th onClick={() => this.sort("name")}>Name</th>
-						<th onClick={() => this.sort("size")}>Size</th>
-						<th onClick={() => this.sort("date")}>Date</th>
-						</tr>
-						</thead>
-						<tbody>{this.state.playlists}</tbody>
-						</table>
+		if (this.state.playlists != null) {
+			if (this.state.playlists.length > 0) {
+				return (
+					<table>
+					<thead>
+					<tr>
+					<th onClick={() => this.sort("name")}>Name</th>
+					<th onClick={() => this.sort("size")}>Size</th>
+					<th onClick={() => this.sort("date")}>Date</th>
+					</tr>
+					</thead>
+					<tbody>{this.state.playlists}</tbody>
+					</table>
 
-						);
-				}
-				else {
-					return(
-						<li>No playlists added yet.</li>
-						);
-				}
+					);
 			}
 			else {
 				return(
-					<li>Loading...</li>
+					<li>No playlists added yet.</li>
 					);
 			}
 		}
-	}
-
-	class Options extends React.Component {
-		constructor(props) {
-			super(props);
-			this.state = {};
-		}
-		delete() {
-			console.log("cona");
-		}
-
-		show(playlist) {
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<Songs playlist={playlist} />,
-				document.getElementById('content')
-				);
-		}
-
-		mySongs() {
-			const songs = this.state.songs;
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<Songs songs={songs} onClick={(i) => this.delete(i)} show={(i) => this.show(i)}/>,
-				document.getElementById('content')
-				);
-		}
-		addSong() {
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<AddSong />,
-				document.getElementById('content')
-				);
-		}
-		allMusic() {
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<AllSongs />,
-				document.getElementById('content')
-				);
-		}
-		myPlaylists() {
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<Playlists show={(playlist) => this.show(playlist)} />,
-				document.getElementById('content')
-				);
-		}
-		createPlaylist() {
-			document.getElementById('content').innerHTML = '';
-			ReactDOM.render(
-				<CreatePlaylist />,
-				document.getElementById('content')
-				);
-		}
-		searchSongs() {
-			ReactDOM.render(
-				<Songs />,
-				document.getElementById('content')
-				);
-		}
-		render() {
+		else {
 			return(
-				<ul>
-				<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
-				<li><a href="#" onClick={() => this.addSong()}>Add Song</a></li>
-				<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
-				<li><a href="#" onClick={() => this.createPlaylist()}>Create Playlist</a></li>
-				<li><a href="#" onClick={() => this.allMusic()}>All Music</a></li>
-				<li>
-					<form onSubmit={this.searchSongs()}>
-					<label>
-					Search Music
-					<input type="text" id="search"/>
-					</label>
-					<input type="submit" value="Search"/>
-					</form>
-				</li>
-				</ul>
+				<li>Loading...</li>
 				);
 		}
 	}
+}
 
-	class SecondComponent extends React.Component {
-		render() {
-			const token = readCookie('token');
-			return(
-				<p>Your token is {token}</p>
-				);
-		}
+class Search extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			keyword: props.keyword,
+			songs: "",
+			playlists: ""
+		};
 	}
 
-	class Welcome extends React.Component {
-		render() {
-			const name = readCookie('name');
+	componentDidMount() {
+
+		axios.get('/api/song/search', {
+			params: {
+				token: readCookie('token'),
+				keyword: this.state.keyword
+
+			}
+		})
+		.then(response => {
+			var songs = [];
+			var playlists = [];
+			axios.get('/api/playlists', {
+				params: {
+					token: readCookie('token')
+				}
+			})
+			.then(response2 => {
+				response2.data.playlists.forEach((playlist) => {
+					playlists.push(<option value={playlist.id}>{playlist.name}</option>)
+				});
+				if (response.data.songs != null) {
+					response.data.songs.forEach((song) => {
+						songs.push(<AllSong song={song} playlists={playlists} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
+						console.log(this.props);
+					});
+				}
+				console.log(playlists);
+				this.setState({playlists});
+				this.setState({ songs });
+				this.forceUpdate();
+			});
+		});
+
+	}
+	render() {
+		if (this.state.songs != null) {
+			if (this.state.songs.length > 0) {
+				return (
+					<div>
+					<h2>Search : {this.state.keyword}</h2>
+					<table>
+					<thead>
+					<tr>
+					<th>Name</th>
+					<th>Artist</th>
+					<th>Album</th>
+					<th>Year</th>
+					</tr>
+					</thead>
+					<tbody>{this.state.songs}</tbody>
+					</table>
+					</div>
+					);
+			}
+			else {
+				return(
+					<div>
+					<h2>Search : {this.state.keyword}</h2>
+					<li>No matching songs.</li>
+					</div>
+					);
+			}
+		}
+		else {
 			return(
 				<div>
-				<h2>{name}'s playlists</h2>
-				<SecondComponent />
+				<h2>Search : {this.state.keyword}</h2>
+				<li>Loading...</li>
 				</div>
 				);
 		}
+
+	}
+}
+
+class Options extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {};
+
+		this.searchSongs = this.searchSongs.bind(this);
+	}
+	delete() {
+		console.log("cona");
 	}
 
-	ReactDOM.render(
-		<Welcome />,
-		document.getElementById('content')
-		);
+	show(playlist) {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<Songs playlist={playlist} />,
+			document.getElementById('content')
+			);
+	}
 
-	ReactDOM.render(
-		<Options />,
-		document.getElementById('options')
-		);
+	mySongs() {
+		const songs = this.state.songs;
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<Songs songs={songs} onClick={(i) => this.delete(i)} show={(i) => this.show(i)}/>,
+			document.getElementById('content')
+			);
+	}
+	addSong() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<AddSong />,
+			document.getElementById('content')
+			);
+	}
+	allMusic() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<AllSongs />,
+			document.getElementById('content')
+			);
+	}
+	myPlaylists() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<Playlists show={(playlist) => this.show(playlist)} />,
+			document.getElementById('content')
+			);
+	}
+	createPlaylist() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<CreatePlaylist />,
+			document.getElementById('content')
+			);
+	}
+	searchSongs() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<Search keyword={document.getElementById("search").value} />,
+			document.getElementById('content')
+			);
+	}
+	render() {
+		return(
+			<ul>
+			<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
+			<li><a href="#" onClick={() => this.addSong()}>Add Song</a></li>
+			<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
+			<li><a href="#" onClick={() => this.createPlaylist()}>Create Playlist</a></li>
+			<li><a href="#" onClick={() => this.allMusic()}>All Music</a></li>
+			<li>
+			<form onSubmit={this.searchSongs}>
+			<label>
+			Search Music:
+			<input type="text" id="search"/>
+			</label>
+			<input type="submit" value="Search"/>
+			</form>
+			</li>
+			</ul>
+			);
+	}
+}
+
+class SecondComponent extends React.Component {
+	render() {
+		const token = readCookie('token');
+		return(
+			<p>Your token is {token}</p>
+			);
+	}
+}
+
+class Welcome extends React.Component {
+	render() {
+		const name = readCookie('name');
+		return(
+			<div>
+			<h2>{name}'s playlists</h2>
+			<SecondComponent />
+			</div>
+			);
+	}
+}
+
+ReactDOM.render(
+	<Welcome />,
+	document.getElementById('content')
+	);
+
+ReactDOM.render(
+	<Options />,
+	document.getElementById('options')
+	);
