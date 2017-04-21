@@ -31,6 +31,81 @@ var realPython = React.createClass({
 }
 });
 
+class AddSong extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			title: "",
+			artist: "",
+			album: "",
+			year: "",
+			file: ""
+		}
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleChange(event) {
+		this.setState({name: event.target.value});
+
+		const target = event.target;
+		const value = target.type === 'checkbox' ? target.checked : target.value;
+		const name = target.name;
+
+		this.setState({
+			[name]: value
+		});
+	}
+
+	handleSubmit(event) {
+		console.log(this.state.name);
+		axios.post('/api/playlist', {
+			token: readCookie('token'),
+			name: this.state.name
+		})
+		.then(response => {
+			alert("Playlist criada");
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.setState({name: ""});
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	render() {
+		return (
+			<div><h2>Add Song</h2>
+			<form onSubmit={this.handleSubmit}>
+			<label>
+			Title:
+			<input type="text" name="title" value={this.state.title} onChange={this.handleChange}/>
+			</label><br/>
+			<label>
+			Artist:
+			<input type="text" name="artist" value={this.state.artist} onChange={this.handleChange}/>
+			</label><br/>
+			<label>
+			Album:
+			<input type="text" name="album" value={this.state.album} onChange={this.handleChange}/>
+			</label><br/>
+			<label>
+			Year:
+			<input type="text" name="year" value={this.state.year} onChange={this.handleChange}/>
+			</label><br/>
+			<label>
+			File:
+			<input type="file" value={this.state.file} onChange={this.handleChange}/>
+			</label><br/>
+			<input type="submit" value="Create"/>
+			</form>
+			</div>
+			);
+	}
+
+}
+
 class CreatePlaylist extends React.Component {
 	constructor(props) {
 		super(props);
@@ -649,6 +724,13 @@ class Playlists extends React.Component {
 				document.getElementById('content')
 				);
 		}
+		addSong() {
+			document.getElementById('content').innerHTML = '';
+			ReactDOM.render(
+				<AddSong />,
+				document.getElementById('content')
+				);
+		}
 		allMusic() {
 			document.getElementById('content').innerHTML = '';
 			ReactDOM.render(
@@ -680,6 +762,7 @@ class Playlists extends React.Component {
 			return(
 				<ul>
 				<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
+				<li><a href="#" onClick={() => this.addSong()}>Add Song</a></li>
 				<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
 				<li><a href="#" onClick={() => this.createPlaylist()}>Create Playlist</a></li>
 				<li><a href="#" onClick={() => this.allMusic()}>All Music</a></li>
