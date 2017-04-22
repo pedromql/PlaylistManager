@@ -92,26 +92,26 @@ class AddSong extends React.Component {
 	render() {
 		return (
 			<div><h2>Add Song</h2>
-			<form onSubmit={this.handleSubmit}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
 			<label>
 			Title:
-			<input type="text" name="title" value={this.state.title} onChange={this.handleChange}/>
+			<input className="form-control" type="text" name="title" value={this.state.title} onChange={this.handleChange}/>
 			</label><br/>
 			<label>
 			Artist:
-			<input type="text" name="artist" value={this.state.artist} onChange={this.handleChange}/>
+			<input className="form-control" type="text" name="artist" value={this.state.artist} onChange={this.handleChange}/>
 			</label><br/>
 			<label>
 			Album:
-			<input type="text" name="album" value={this.state.album} onChange={this.handleChange}/>
+			<input className="form-control" type="text" name="album" value={this.state.album} onChange={this.handleChange}/>
 			</label><br/>
 			<label>
 			Year:
-			<input type="text" name="year" value={this.state.year} onChange={this.handleChange}/>
+			<input className="form-control" type="text" name="year" value={this.state.year} onChange={this.handleChange}/>
 			</label><br/>
 			<label>
 			File:
-			<input type="file" name="file" id="file"/>
+			<input className="form-control" type="file" name="file" id="file"/>
 			</label><br/>
 			<input type="submit" className="templatemo-blue-button" value="Create"/>
 			</form>
@@ -155,10 +155,10 @@ class CreatePlaylist extends React.Component {
 	render() {
 		return (
 			<div><h2>Create Playlist</h2>
-			<form onSubmit={this.handleSubmit}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
 			<label>
 			Playlist name:
-			<input type="text" value={this.state.name} onChange={this.handleChange}/>
+			<input className="form-control" type="text" value={this.state.name} onChange={this.handleChange}/>
 			</label>
 			<input type="submit" className="templatemo-blue-button" value="Create"/>
 			</form>
@@ -230,7 +230,7 @@ class AllSong extends React.Component {
 			<td>{this.props.song.album}</td>
 			<td>{this.props.song.year}</td>
 			<td>
-			<form onSubmit={this.handleSubmit}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
 			<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 			{this.state.playlists}
 			</select>
@@ -477,24 +477,24 @@ class MySong extends React.Component {
 		else {
 			return (
 				<tr key={this.props.song.id}>
-				<form onSubmit={this.handleSubmitEdit}>
+				<form className="templatemo-login-form" onSubmit={this.handleSubmitEdit}>
 				<td>
-				<input type="text" name="title" value={this.state.title[0]} onChange={this.handleChangeEdit}/>
+				<input className="form-control" type="text" name="title" value={this.state.title[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input type="text" name="artist" value={this.state.artist[0]} onChange={this.handleChangeEdit}/>
+				<input className="form-control" type="text" name="artist" value={this.state.artist[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input type="text" name="album" value={this.state.album[0]} onChange={this.handleChangeEdit}/>
+				<input className="form-control" type="text" name="album" value={this.state.album[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
+				<input className="form-control" type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<input type="submit" hidden/></form>
 				<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
 				<td><button className="templatemo-blue-button" onClick={() => this.onEdit()}>Cancel Edit</button></td>
 				<td>
-				<form onSubmit={this.handleSubmit}>
+				<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
 				<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 				{this.state.playlists}
 				</select>
@@ -563,7 +563,7 @@ class Song extends React.Component {
 			<td>{this.props.song.year}</td>
 			<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
 			<td>
-			<form onSubmit={this.handleSubmit}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
 			<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 			{this.state.playlists}
 			</select>
@@ -851,8 +851,8 @@ class Playlist extends React.Component {
 			return (
 				<tr key={this.props.playlist.id}>
 				<td>
-				<form onSubmit={this.handleSubmit}>
-				<input type="text" value={this.props.playlist.name} onChange={this.handleChange}/>
+				<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
+				<input className="form-control" type="text" value={this.props.playlist.name} onChange={this.handleChange}/>
 				<input type="submit" hidden/>
 				</form>
 				</td>
@@ -1027,7 +1027,7 @@ class Search extends React.Component {
 		super(props);
 		this.state = {
 			keyword: props.keyword,
-			songs: "",
+			songs: null,
 			playlists: ""
 		};
 	}
@@ -1189,24 +1189,24 @@ class EditUser extends React.Component {
 	render() {
 		return (
 			<div><h2>Edit User</h2>
-			<form onSubmit={this.handleSubmitName}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmitName}>
 			<label>
 			Name:
-			<input type="text" value={this.state.name} onChange={this.handleChangeName}/>
+			<input className="form-control" type="text" value={this.state.name} onChange={this.handleChangeName}/>
 			</label>
 			<input type="submit" className="templatemo-blue-button" value="Edit Name"/>
 			</form>
-			<form onSubmit={this.handleSubmitEmail}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmitEmail}>
 			<label>
 			Email:
-			<input type="text" value={this.state.email} onChange={this.handleChangeEmail}/>
+			<input className="form-control" type="text" value={this.state.email} onChange={this.handleChangeEmail}/>
 			</label>
 			<input type="submit" className="templatemo-blue-button" value="Edit Email"/>
 			</form>
-			<form onSubmit={this.handleSubmitPassword}>
+			<form className="templatemo-login-form" onSubmit={this.handleSubmitPassword}>
 			<label>
 			Password:
-			<input type="password" value={this.state.password} onChange={this.handleChangePassword}/>
+			<input className="form-control" type="password" value={this.state.password} onChange={this.handleChangePassword}/>
 			</label>
 			<input type="submit" className="templatemo-blue-button" value="Edit Password"/>
 			</form>
