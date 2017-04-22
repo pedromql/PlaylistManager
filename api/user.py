@@ -191,7 +191,7 @@ def edit_value(type, token, value):
 		elif type == 'name':
 			if user.name == value:
 				return "Not changed"
-			if len(value) < 6 or len(value) > 100:
+			if len(value) < 1 or len(value) > 100:
 				return jsonResponse('Error', 'Insert a valid name (more than 6 characters and less than 100)', 403)
 
 		elif type == 'password':

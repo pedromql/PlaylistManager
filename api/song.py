@@ -382,7 +382,7 @@ def accessSong(id):
 def play_song():
     token = request.args.get('token')
     songid = request.args.get('songid')
-    # verify if token and  request are correct and check them in database
+    # verify if token and request are correct and check them in database
     if token is None or token == 1:
         return jsonResponse('Error', 'Server Error', 500)
 

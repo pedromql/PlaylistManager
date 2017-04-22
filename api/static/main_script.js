@@ -113,7 +113,7 @@ class AddSong extends React.Component {
 			File:
 			<input type="file" name="file" id="file"/>
 			</label><br/>
-			<input type="submit" value="Create"/>
+			<input type="submit" className="templatemo-blue-button" value="Create"/>
 			</form>
 			</div>
 			);
@@ -160,7 +160,7 @@ class CreatePlaylist extends React.Component {
 			Playlist name:
 			<input type="text" value={this.state.name} onChange={this.handleChange}/>
 			</label>
-			<input type="submit" value="Create"/>
+			<input type="submit" className="templatemo-blue-button" value="Create"/>
 			</form>
 			</div>
 			);
@@ -171,16 +171,25 @@ class CreatePlaylist extends React.Component {
 class AllSong extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log("AQUI MANE");
-		console.log(props);
-		this.state = {
-			playlists: props.playlists,
-			value: props.playlists[0].props.value
-		};
+		
+		if (props.playlists.length > 0) {
+			this.state = {
+				playlists: props.playlists,
+				value: props.playlists[0].props.value
+			};
+		}
+		else {
+			this.state = {
+				playlists: props.playlists,
+				value: ""
+			};
+		}
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.play = this.play.bind(this);
 	}
+
 	handleChange(event) {
 		this.setState({value: event.target.value});
 	}
@@ -202,6 +211,17 @@ class AllSong extends React.Component {
 		event.preventDefault();
 	}
 
+	play(event) {
+		player.setState({
+			id: this.props.song.id,
+			title: this.props.song.title,
+			artist: this.props.song.artist,
+			album: this.props.song.album,
+			year: this.props.song.year,
+			src: "/api/song/play?token="+readCookie('token')+"&songid="+this.props.song.id+""
+		})
+	}
+
 	render() {
 		return (
 			<tr key={this.props.song.id}>
@@ -211,11 +231,14 @@ class AllSong extends React.Component {
 			<td>{this.props.song.year}</td>
 			<td>
 			<form onSubmit={this.handleSubmit}>
-			<select value={this.state.value} onChange={this.handleChange}>
+			<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 			{this.state.playlists}
 			</select>
-			<input type="submit" value="Add to playlist"/>
+			<input className="templatemo-blue-button" type="submit" value="Add to playlist"/>
 			</form>
+			</td>
+			<td>
+			<button className="templatemo-blue-button" onClick={this.play}>Play Song</button>
 			</td>
 			</tr>
 			);
@@ -233,7 +256,7 @@ class AllSongs extends React.Component {
 	}
 
 	componentDidMount() {
-		
+
 		axios.get('/api/song/listall', {
 			params: {
 				token: readCookie('token')
@@ -263,32 +286,36 @@ class AllSongs extends React.Component {
 				this.forceUpdate();
 			});
 		});
-		
+
 	}
 	render() {
 		if (this.state.songs != null) {
 			if (this.state.songs.length > 0) {
 				return (
-					<div>
-					<h2>All Songs</h2>
-					<table>
+					<div className="panel panel-default templatemo-content-widget white-bg no-padding templatemo-overflow-hidden">
+					<div className="panel-heading templatemo-position-relative"><h2>All Music</h2></div>
+					<div className="table-responsive">
+					<table className="table table-striped table-bordered">
 					<thead>
 					<tr>
 					<th>Name</th>
 					<th>Artist</th>
 					<th>Album</th>
 					<th>Year</th>
+					<th></th>
+					<th></th>
 					</tr>
 					</thead>
 					<tbody>{this.state.songs}</tbody>
 					</table>
+					</div>
 					</div>
 					);
 			}
 			else {
 				return(
 					<div>
-					<h2>All Songs</h2>
+					<h2>All Music</h2>
 					<li>No songs added yet.</li>
 					</div>
 					);
@@ -297,12 +324,12 @@ class AllSongs extends React.Component {
 		else {
 			return(
 				<div>
-				<h2>All Songs</h2>
+				<h2>All Music</h2>
 				<li>Loading...</li>
 				</div>
 				);
 		}
-		
+
 	}
 }
 
@@ -311,21 +338,36 @@ class MySong extends React.Component {
 		super(props);
 		console.log("AQUI MANE");
 		console.log(props);
-		this.state = {
-			id: props.song.id,
-			playlists: props.playlists,
-			value: props.playlists[0].props.value,
-			title: [props.song.title, props.song.title],
-			artist: [props.song.artist, props.song.artist],
-			album: [props.song.album, props.song.album],
-			year: [props.song.year, props.song.year],
-			editable: "false"
-		};
+		if (props.playlists.length > 0) {
+			this.state = {
+				id: props.song.id,
+				playlists: props.playlists,
+				value: props.playlists[0].props.value,
+				title: [props.song.title, props.song.title],
+				artist: [props.song.artist, props.song.artist],
+				album: [props.song.album, props.song.album],
+				year: [props.song.year, props.song.year],
+				editable: "false"
+			};
+		}
+		else {
+			this.state = {
+				id: props.song.id,
+				playlists: props.playlists,
+				value: "",
+				title: [props.song.title, props.song.title],
+				artist: [props.song.artist, props.song.artist],
+				album: [props.song.album, props.song.album],
+				year: [props.song.year, props.song.year],
+				editable: "false"
+			};
+		}
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleChangeEdit = this.handleChangeEdit.bind(this);
 		this.handleSubmitEdit = this.handleSubmitEdit.bind(this);
+		this.play = this.play.bind(this);
 	}
 
 	handleChange(event) {
@@ -399,6 +441,17 @@ class MySong extends React.Component {
 		});
 	}
 
+	play(event) {
+		player.setState({
+			id: this.props.song.id,
+			title: this.state.title[0],
+			artist: this.state.artist[0],
+			album: this.state.album[0],
+			year: this.state.year[0],
+			src: "/api/song/play?token="+readCookie('token')+"&songid="+this.props.song.id+""
+		})
+	}
+
 	render() {
 		if (this.state.editable == "false") {
 			return (
@@ -407,16 +460,17 @@ class MySong extends React.Component {
 				<td>{this.state.artist[0]}</td>
 				<td>{this.state.album[0]}</td>
 				<td>{this.state.year[0]}</td>
-				<td><button onClick={() => this.props.onClick()}>Delete</button></td>
-				<td><button onClick={() => this.onEdit()}>Edit</button></td>
+				<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
+				<td><button className="templatemo-blue-button" onClick={() => this.onEdit()}>Edit</button></td>
 				<td>
-				<form onSubmit={this.handleSubmit}>
-				<select value={this.state.value} onChange={this.handleChange}>
+				<form className="templatemo-login-form" onSubmit={this.handleSubmit}>
+				<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 				{this.state.playlists}
 				</select>
-				<input type="submit" value="Add to playlist"/>
+				<input className="templatemo-blue-button" type="submit" value="Add to playlist"/>
 				</form>
 				</td>
+				<td><button className="templatemo-blue-button" onClick={this.play}>Play Song</button></td>
 				</tr>
 				);
 		}
@@ -437,16 +491,17 @@ class MySong extends React.Component {
 				<input type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<input type="submit" hidden/></form>
-				<td><button onClick={() => this.props.onClick()}>Delete</button></td>
-				<td><button onClick={() => this.onEdit()}>Cancel Edit</button></td>
+				<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
+				<td><button className="templatemo-blue-button" onClick={() => this.onEdit()}>Cancel Edit</button></td>
 				<td>
 				<form onSubmit={this.handleSubmit}>
-				<select value={this.state.value} onChange={this.handleChange}>
+				<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 				{this.state.playlists}
 				</select>
-				<input type="submit" value="Add to playlist"/>
+				<input className="templatemo-blue-button" type="submit" value="Add to playlist"/>
 				</form>
 				</td>
+				<td><button className="templatemo-blue-button" onClick={this.play}>Play Song</button></td>
 				</tr>
 				);
 		}
@@ -465,6 +520,7 @@ class Song extends React.Component {
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.play = this.play.bind(this);
 	}
 	handleChange(event) {
 		this.setState({value: event.target.value});
@@ -487,6 +543,17 @@ class Song extends React.Component {
 		event.preventDefault();
 	}
 
+	play(event) {
+		player.setState({
+			id: this.props.song.id,
+			title: this.props.song.title,
+			artist: this.props.song.artist,
+			album: this.props.song.album,
+			year: this.props.song.year,
+			src: "/api/song/play?token="+readCookie('token')+"&songid="+this.props.song.id+""
+		})
+	}
+
 	render() {
 		return (
 			<tr key={this.props.song.id}>
@@ -494,15 +561,16 @@ class Song extends React.Component {
 			<td>{this.props.song.artist}</td>
 			<td>{this.props.song.album}</td>
 			<td>{this.props.song.year}</td>
-			<td><button onClick={() => this.props.onClick()}>Delete</button></td>
+			<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
 			<td>
 			<form onSubmit={this.handleSubmit}>
-			<select value={this.state.value} onChange={this.handleChange}>
+			<select className="form-control" value={this.state.value} onChange={this.handleChange}>
 			{this.state.playlists}
 			</select>
-			<input type="submit" value="Add to playlist"/>
+			<input className="templatemo-blue-button" type="submit" value="Add to playlist"/>
 			</form>
 			</td>
+			<td><button className="templatemo-blue-button" onClick={this.play}>Play Song</button></td>
 			</tr>
 			);
 	}
@@ -533,7 +601,7 @@ class Songs extends React.Component {
 						songs.splice(i, 1);
 						this.setState({songs})
 					});
-					
+
 					break;
 				}
 			}
@@ -556,7 +624,7 @@ class Songs extends React.Component {
 						songs.splice(i, 1);
 						this.setState({songs})
 					});
-					
+
 					break;
 				}
 			}
@@ -595,7 +663,7 @@ class Songs extends React.Component {
 					this.setState({ songs });
 					this.forceUpdate();
 				});
-				
+
 			});
 		}
 		else {
@@ -631,28 +699,35 @@ class Songs extends React.Component {
 					this.setState({ songs });
 					this.forceUpdate();
 				});
-				
+
 			});
 		}
 	}
+
 	render() {
 		if (this.props.playlist == null) {
 			if (this.state.songs != null) {
 				if (this.state.songs.length > 0) {
 					return (
-						<div>
-						<h2>My Songs</h2>
-						<table>
+						<div className="panel panel-default templatemo-content-widget white-bg no-padding templatemo-overflow-hidden">
+						<div className="panel-heading templatemo-position-relative"><h2>My Songs</h2></div>
+						<div className="table-responsive">
+						<table className="table table-striped table-bordered">
 						<thead>
 						<tr>
 						<th>Title</th>
 						<th>Artist</th>
 						<th>Album</th>
 						<th>Year</th>
+						<th></th>
+						<th></th>
+						<th></th>
+						<th></th>
 						</tr>
 						</thead>
 						<tbody>{this.state.songs}</tbody>
 						</table>
+						</div>
 						</div>
 						);
 				}
@@ -678,19 +753,24 @@ class Songs extends React.Component {
 			if (this.state.songs != null) {
 				if (this.state.songs.length > 0) {
 					return (
-						<div>
-						<h2>{this.props.playlist.name}</h2>
-						<table>
+						<div className="panel panel-default templatemo-content-widget white-bg no-padding templatemo-overflow-hidden">
+						<div className="panel-heading templatemo-position-relative"><h2>{this.props.playlist.name}</h2></div>
+						<div className="table-responsive">
+						<table className="table table-striped table-bordered">
 						<thead>
 						<tr>
 						<th>Title</th>
 						<th>Artist</th>
 						<th>Album</th>
 						<th>Year</th>
+						<th></th>
+						<th></th>
+						<th></th>
 						</tr>
 						</thead>
 						<tbody>{this.state.songs}</tbody>
 						</table>
+						</div>
 						</div>
 						);
 				}
@@ -756,13 +836,13 @@ class Playlist extends React.Component {
 				<td>{this.props.playlist.size}</td>
 				<td>{this.props.playlist.date}</td>
 				<td>
-				<button onClick={() => this.props.onClick()}>Delete</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button>
 				</td>
 				<td>
-				<button onClick={() => this.props.onUpdate()}>Modify playlist</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onUpdate()}>Modify playlist</button>
 				</td>
 				<td>
-				<button onClick={() => this.props.onShow()}>View playlist</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onShow()}>View playlist</button>
 				</td>
 				</tr>
 				);
@@ -779,13 +859,13 @@ class Playlist extends React.Component {
 				<td>{this.props.playlist.size}</td>
 				<td>{this.props.playlist.date}</td>
 				<td>
-				<button onClick={() => this.props.onClick()}>Delete</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button>
 				</td>
 				<td>
-				<button onClick={() => this.props.onUpdate()}>Cancel modification</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onUpdate()}>Cancel modification</button>
 				</td>
 				<td>
-				<button onClick={() => this.props.onShow()}>View playlist</button>
+				<button className="templatemo-blue-button" onClick={() => this.props.onShow()}>View playlist</button>
 				</td>
 				</tr>
 				);
@@ -908,17 +988,24 @@ class Playlists extends React.Component {
 		if (this.state.playlists != null) {
 			if (this.state.playlists.length > 0) {
 				return (
-					<table>
+					<div className="panel panel-default templatemo-content-widget white-bg no-padding templatemo-overflow-hidden">
+					<div className="panel-heading templatemo-position-relative"><h2>My Playlists</h2></div>
+					<div className="table-responsive">
+					<table className="table table-striped table-bordered">
 					<thead>
 					<tr>
 					<th onClick={() => this.sort("name")}>Name</th>
 					<th onClick={() => this.sort("size")}>Size</th>
 					<th onClick={() => this.sort("date")}>Date</th>
+					<th></th>
+					<th></th>
+					<th></th>
 					</tr>
 					</thead>
 					<tbody>{this.state.playlists}</tbody>
 					</table>
-
+					</div>
+					</div>
 					);
 			}
 			else {
@@ -968,8 +1055,7 @@ class Search extends React.Component {
 				});
 				if (response.data.songs != null) {
 					response.data.songs.forEach((song) => {
-						songs.push(<AllSong song={song} playlists={playlists} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-						console.log(this.props);
+						songs.push(<AllSong song={song} playlists={playlists} key={song.id} value={song.id} />);
 					});
 				}
 				console.log(playlists);
@@ -984,9 +1070,10 @@ class Search extends React.Component {
 		if (this.state.songs != null) {
 			if (this.state.songs.length > 0) {
 				return (
-					<div>
-					<h2>Search : {this.state.keyword}</h2>
-					<table>
+					<div className="panel panel-default templatemo-content-widget white-bg no-padding templatemo-overflow-hidden">
+					<div className="panel-heading templatemo-position-relative"><h2>{this.state.keyword}</h2></div>
+					<div className="table-responsive">
+					<table className="table table-striped table-bordered">
 					<thead>
 					<tr>
 					<th>Name</th>
@@ -997,6 +1084,7 @@ class Search extends React.Component {
 					</thead>
 					<tbody>{this.state.songs}</tbody>
 					</table>
+					</div>
 					</div>
 					);
 			}
@@ -1021,16 +1109,197 @@ class Search extends React.Component {
 	}
 }
 
-class Options extends React.Component {
+class EditUser extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			name: "",
+			email: "",
+			password: ""
+		};
+
+		this.handleChangeEmail = this.handleChangeEmail.bind(this);
+		this.handleSubmitEmail = this.handleSubmitEmail.bind(this);
+		this.handleChangeName = this.handleChangeName.bind(this);
+		this.handleSubmitName = this.handleSubmitName.bind(this);
+		this.handleChangePassword = this.handleChangePassword.bind(this);
+		this.handleSubmitPassword = this.handleSubmitPassword.bind(this);
+
+	}
+
+	handleChangeEmail(event) {
+		this.setState({email: event.target.value});
+	}
+
+	handleSubmitEmail(event) {
+		axios.put('/api/user/edit', {
+			token: readCookie('token'),
+			email: this.state.email
+		})
+		.then(response => {
+			alert("Email changed.");
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.setState({email: ""});
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	handleChangeName(event) {
+		this.setState({name: event.target.value});
+	}
+
+	handleSubmitName(event) {
+		axios.put('/api/user/edit', {
+			token: readCookie('token'),
+			name: this.state.name
+		})
+		.then(response => {
+			alert("Name changed.");
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			createCookie('name',this.state.name, 100);
+			document.getElementById('sidebar-nome').innerHTML = readCookie('name');
+			this.setState({name: ""});
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	handleChangePassword(event) {
+		this.setState({password: event.target.value});
+	}
+
+	handleSubmitPassword(event) {
+		axios.put('/api/user/edit', {
+			token: readCookie('token'),
+			password: this.state.password
+		})
+		.then(response => {
+			alert("Password changed.");
+			console.log("Actualizado no servidor.");
+			console.log(response);
+			this.setState({password: ""});
+			this.forceUpdate();
+		});
+		event.preventDefault();
+	}
+
+	render() {
+		return (
+			<div><h2>Edit User</h2>
+			<form onSubmit={this.handleSubmitName}>
+			<label>
+			Name:
+			<input type="text" value={this.state.name} onChange={this.handleChangeName}/>
+			</label>
+			<input type="submit" className="templatemo-blue-button" value="Edit Name"/>
+			</form>
+			<form onSubmit={this.handleSubmitEmail}>
+			<label>
+			Email:
+			<input type="text" value={this.state.email} onChange={this.handleChangeEmail}/>
+			</label>
+			<input type="submit" className="templatemo-blue-button" value="Edit Email"/>
+			</form>
+			<form onSubmit={this.handleSubmitPassword}>
+			<label>
+			Password:
+			<input type="password" value={this.state.password} onChange={this.handleChangePassword}/>
+			</label>
+			<input type="submit" className="templatemo-blue-button" value="Edit Password"/>
+			</form>
+			</div>
+			);
+	}
+}
+
+class Player extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			id: "",
+			title: "",
+			artist: "",
+			album: "",
+			year: "",
+			src: ""
+		};
+	}
+	componentDidUpdate(prevProps, prevState) {
+		document.getElementById("audio").load();
+		document.getElementById("audio").play();
+	}
+	render() {
+		if (this.state.id != "") {
+			return(
+				<div>
+				<h2>Media Player</h2>
+				<p>Song: {this.state.title} | Artist: {this.state.artist} | Album: {this.state.album} | Year: {this.state.year}</p>
+				<audio id="audio" controls autoplay>
+				<source src={this.state.src} type="audio/mpeg"/>
+				</audio>
+				</div>
+				);
+		}
+		else {
+			return (
+				<div>
+				<h2>Media Player</h2>
+				<p>Nothing to play</p>
+				</div>);
+		}
+	}
+}
+
+class Sidebar extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {};
 
 		this.searchSongs = this.searchSongs.bind(this);
 	}
-	delete() {
-		console.log("cona");
+	deleteUser() {
+		swal({
+			title: 'Are you sure you want to delete your account?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then(function () {
+			axios.delete('/api/user/delete', {
+				params: {
+					token: readCookie('token')
+				}
+			})
+			.then(response => {
+				console.log("Removido do servidor.");
+				console.log(response);
+				eraseCookie('token');
+				window.location.href = "/";
+			});
+		})
 	}
+
+	logout() {
+
+		eraseCookie('token');
+		window.location.href = "/";
+
+	}
+
+	editUser() {
+		document.getElementById('content').innerHTML = '';
+		ReactDOM.render(
+			<EditUser />,
+			document.getElementById('content')
+			);
+	}
+
+
 
 	show(playlist) {
 		document.getElementById('content').innerHTML = '';
@@ -1041,10 +1310,10 @@ class Options extends React.Component {
 	}
 
 	mySongs() {
-		const songs = this.state.songs;
+
 		document.getElementById('content').innerHTML = '';
 		ReactDOM.render(
-			<Songs songs={songs} onClick={(i) => this.delete(i)} show={(i) => this.show(i)}/>,
+			<Songs />,
 			document.getElementById('content')
 			);
 	}
@@ -1086,85 +1355,42 @@ class Options extends React.Component {
 	render() {
 		return(
 			<ul>
-			<li><a href="#" onClick={() => this.mySongs()}>My Songs</a></li>
-			<li><a href="#" onClick={() => this.addSong()}>Add Song</a></li>
-			<li><a href="#" onClick={() => this.myPlaylists()}>My Playlists</a></li>
-			<li><a href="#" onClick={() => this.createPlaylist()}>Create Playlist</a></li>
-			<li><a href="#" onClick={() => this.allMusic()}>All Music</a></li>
 			<li>
-			<form onSubmit={this.searchSongs}>
-			<label>
-			Search Music:
-			<input type="text" id="search"/>
-			</label>
-			<input type="submit" value="Search"/>
+			<form className="templatemo-search-form" onSubmit={this.searchSongs}>
+			<div className="input-group">
+			<button type="submit" className="fa fa-search"></button>
+			<input type="text" className="form-control" placeholder="Search" id="search"/>           
+			</div>
 			</form>
 			</li>
+			<li><a href="#" onClick={() => this.mySongs()}><i className="fa fa-list fa-fw"></i>My Songs</a></li>
+			<li><a href="#" onClick={() => this.addSong()}><i className="fa fa-music fa-fw"></i>Add Song</a></li>
+			<li><a href="#" onClick={() => this.myPlaylists()}><i className="fa fa-list fa-fw"></i>My Playlists</a></li>
+			<li><a href="#" onClick={() => this.createPlaylist()}><i className="fa fa-pencil fa-fw"></i>Create Playlist</a></li>
+			<li><a href="#" onClick={() => this.allMusic()}><i className="fa fa-list fa-fw"></i>All Music</a></li>
+			<li><a href="#" onClick={() => this.editUser()}><i className="fa fa-user fa-fw"></i>Edit User</a></li>
+			<li><a href="#" onClick={() => this.deleteUser()}><i className="fa fa-trash fa-fw"></i>Delete User</a></li>
+			<li><a href="#" onClick={() => this.logout()}><i className="fa fa-sign-out fa-fw"></i>Logout</a></li>
 			</ul>
 			);
 	}
 }
 
-class SecondComponent extends React.Component {
-	render() {
-		const token = readCookie('token');
-		return(
-			<p>Your token is {token}</p>
-			);
-	}
-}
+ReactDOM.render(
+	<Sidebar />,
+	document.getElementById('sidebar')
+	);
 
-class Welcome extends React.Component {
-	render() {
-		const name = readCookie('name');
-		return(
-			<div>
-			<h2>{name}'s playlists</h2>
-			<SecondComponent />
-			</div>
-			);
-	}
-}
-
-class DeleteUser extends React.Component {
-	constructor() {
-		super();
-		this.delete = this.delete.bind(this);
-	}
-	delete(event) {
-		axios.delete('/api/user/delete', {
-			params: {
-				token: readCookie('token')
-			}
-		})
-		.then(response => {
-			console.log("Removido do servidor.");
-			console.log(response);
-			eraseCookie('token');
-			window.location.href = "/";
-		});
-		event.preventDefault();
-	}
-	render() {
-		return (
-			<form onSubmit={this.delete}>
-			<input type="submit" value="Delete User"/>
-			</form>
-			);
-	}
-}
+document.getElementById('sidebar-nome').innerHTML = readCookie('name');
 
 ReactDOM.render(
-	<Welcome />,
+	<Songs />,
 	document.getElementById('content')
 	);
 
-ReactDOM.render(
-	<Options />,
-	document.getElementById('options')
+var player = ReactDOM.render(
+	<Player />,
+	document.getElementById('player')
 	);
 
-ReactDOM.render(
-	<DeleteUser />,
-	document.getElementById('delete')
-	);
+document.getElementById('sidebar-nome').innerHTML = readCookie('name');
