@@ -155,6 +155,17 @@ def create_playlist():
 		name = request.json['name']
 		token = request.json['token']
 
+		if len(name) == 0:
+			response_data = {
+				'result' : 'Error',
+				'message' : 'Invalid name'
+			}
+
+			response = jsonify(response_data)
+			response.status_code = 403
+
+			return response
+
 		session = create_session()
 
 		#check if username exists

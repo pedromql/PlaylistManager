@@ -47,7 +47,7 @@ class AddSong extends React.Component {
 	}
 
 	handleChange(event) {
-		// this.setState({name: event.target.value});
+		
 
 		const target = event.target;
 		const name = target.name;
@@ -73,7 +73,12 @@ class AddSong extends React.Component {
 		};
 		axios.post('/api/song/create', data, config)
 		.then(response => {
-			alert("PORREIRO PA!");
+			swal({
+				title: "Song uploaded!",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.setState({
 				title: "",
 				artist: "",
@@ -82,9 +87,14 @@ class AddSong extends React.Component {
 			});
 			$("#file").val('');
 		})
-		.catch(error => {
-			console.log(error);
-			alert("UPS!");
+		.catch(function (error) {
+			swal({
+				title: "Upload failed!",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -137,17 +147,29 @@ class CreatePlaylist extends React.Component {
 	}
 
 	handleSubmit(event) {
-		console.log(this.state.name);
+		
 		axios.post('/api/playlist', {
 			token: readCookie('token'),
 			name: this.state.name
 		})
 		.then(response => {
-			alert("Playlist criada");
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Playlist created!",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.setState({name: ""});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Playlist creation failed.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -195,7 +217,7 @@ class AllSong extends React.Component {
 	}
 
 	handleSubmit(event) {
-		console.log(this.state.value);
+		
 		var songs = [];
 		songs.push(this.props.song.id);
 		axios.post('/api/playlist/song', {
@@ -204,9 +226,22 @@ class AllSong extends React.Component {
 			songs: songs
 		})
 		.then(response => {
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Added to playlist.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Add to playlist failed.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -277,10 +312,10 @@ class AllSongs extends React.Component {
 				if (response.data.songs != null) {
 					response.data.songs.forEach((song) => {
 						songs.push(<AllSong song={song} playlists={playlists} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-						console.log(this.props);
+						
 					});
 				}
-				console.log(playlists);
+				
 				this.setState({playlists});
 				this.setState({ songs });
 				this.forceUpdate();
@@ -336,8 +371,7 @@ class AllSongs extends React.Component {
 class MySong extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log("AQUI MANE");
-		console.log(props);
+		
 		if (props.playlists.length > 0) {
 			this.state = {
 				id: props.song.id,
@@ -375,7 +409,7 @@ class MySong extends React.Component {
 	}
 
 	handleSubmit(event) {
-		console.log(this.state.value);
+		
 		var songs = [];
 		songs.push(this.props.song.id);
 		axios.post('/api/playlist/song', {
@@ -384,9 +418,22 @@ class MySong extends React.Component {
 			songs: songs
 		})
 		.then(response => {
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Added to playlist.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Add to playlist failed.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -395,7 +442,7 @@ class MySong extends React.Component {
 		const target = event.target;
 		const name = target.name;
 		const original = this.state[name][1]
-		console.log(original);
+		
 
 		this.setState({
 			[name]: [target.value, original]
@@ -403,7 +450,7 @@ class MySong extends React.Component {
 	}
 
 	handleSubmitEdit(event) {
-		console.log(this.state.value);
+		
 		var songs = [];
 		songs.push(this.props.song.id);
 		axios.put('/api/song/edit', {
@@ -415,8 +462,13 @@ class MySong extends React.Component {
 			year: this.state.year[0]
 		})
 		.then(response => {
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Song edited.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
+
 			this.setState({
 				editable: "false",
 				title: [this.state.title[0],this.state.title[0]],
@@ -426,7 +478,13 @@ class MySong extends React.Component {
 			});
 		})
 		.catch(error => {
-			console.log(error);
+			swal({
+				title: "Failed to edit.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -477,18 +535,18 @@ class MySong extends React.Component {
 		else {
 			return (
 				<tr key={this.props.song.id}>
-				<form className="templatemo-login-form" onSubmit={this.handleSubmitEdit}>
+				<form onSubmit={this.handleSubmitEdit}>
 				<td>
-				<input className="form-control" type="text" name="title" value={this.state.title[0]} onChange={this.handleChangeEdit}/>
+				<input type="text" name="title" value={this.state.title[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input className="form-control" type="text" name="artist" value={this.state.artist[0]} onChange={this.handleChangeEdit}/>
+				<input type="text" name="artist" value={this.state.artist[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input className="form-control" type="text" name="album" value={this.state.album[0]} onChange={this.handleChangeEdit}/>
+				<input type="text" name="album" value={this.state.album[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<td>
-				<input className="form-control" type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
+				<input type="text" name="year" value={this.state.year[0]} onChange={this.handleChangeEdit}/>
 				</td>
 				<input type="submit" hidden/></form>
 				<td><button className="templatemo-blue-button" onClick={() => this.props.onClick()}>Delete</button></td>
@@ -511,8 +569,7 @@ class MySong extends React.Component {
 class Song extends React.Component {
 	constructor(props) {
 		super(props);
-		console.log("AQUI MANE");
-		console.log(props);
+		
 		this.state = {
 			playlists: props.playlists,
 			value: props.playlists[0].props.value
@@ -527,7 +584,7 @@ class Song extends React.Component {
 	}
 
 	handleSubmit(event) {
-		console.log(this.state.value);
+		
 		var songs = [];
 		songs.push(this.props.song.id);
 		axios.post('/api/playlist/song', {
@@ -536,9 +593,22 @@ class Song extends React.Component {
 			songs: songs
 		})
 		.then(response => {
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Added to playlist.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Add to playlist failed.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -596,10 +666,23 @@ class Songs extends React.Component {
 						}
 					})
 					.then(response => {
-						console.log("Removido do servidor.");
-						console.log(response);
+						swal({
+							title: "Song deleted.",
+							type: "success",
+							timer: 2000,
+							showConfirmButton: true
+						});
 						songs.splice(i, 1);
 						this.setState({songs})
+					})
+					.catch(error => {
+						swal({
+							title: "Failed to delete song.",
+							text: error.response.data.message,
+							type: "error",
+							timer: 2000,
+							showConfirmButton: true
+						});
 					});
 
 					break;
@@ -619,10 +702,24 @@ class Songs extends React.Component {
 						}
 					})
 					.then(response => {
-						console.log("Removido do servidor.");
-						console.log(response);
+						swal({
+							title: "Removed from playlist.",
+							type: "success",
+							timer: 2000,
+							showConfirmButton: true
+						});
 						songs.splice(i, 1);
 						this.setState({songs})
+
+					})
+					.catch(error => {
+						swal({
+							title: "Failed to remove from playlist.",
+							text: error.response.data.message,
+							type: "error",
+							timer: 2000,
+							showConfirmButton: true
+						});
 					});
 
 					break;
@@ -654,11 +751,10 @@ class Songs extends React.Component {
 					if (response.data.songs != null) {
 						response.data.songs.forEach((song) => {
 							songs.push(<MySong playlists={playlists} song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-							console.log(this.props);
+							
 						});
 					}
-					console.log(playlists)
-					console.log("acima");
+					
 					this.setState({playlists});
 					this.setState({ songs });
 					this.forceUpdate();
@@ -690,11 +786,10 @@ class Songs extends React.Component {
 					if (response.data.songs != null) {
 						response.data.songs.forEach((song) => {
 							songs.push(<Song playlists={playlists} song={song} key={song.id} value={song.id} onClick={() => this.delete(song.id)} />);
-							console.log(this.props);
+							
 						});
 					}
-					console.log(playlists)
-					console.log("acima");
+					
 					this.setState({playlists});
 					this.setState({ songs });
 					this.forceUpdate();
@@ -809,7 +904,7 @@ class Playlist extends React.Component {
 	handleChange(event) {
 		this.props.playlist.name = event.target.value;
 		this.setState({name: event.target.value});
-		console.log(event.target.value);
+		
 	}
 
 	handleSubmit(event) {
@@ -819,11 +914,26 @@ class Playlist extends React.Component {
 			name: this.props.playlist.name
 		})
 		.then(response => {
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Playlist name changed",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
+
 			this.props.playlist.original = this.props.playlist.name;
 			delete this.props.editable;
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Failed to change playlist name.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 3000,
+				showConfirmButton: true
+			});
+
 		});
 		event.preventDefault();
 	}
@@ -895,10 +1005,24 @@ class Playlists extends React.Component {
 					}
 				})
 				.then(response => {
-					console.log("Removido do servidor.");
-					console.log(response);
+					swal({
+						title: "Playlist deleted.",
+						type: "success",
+						timer: 2000,
+						showConfirmButton: true
+					});
 					playlists.splice(i, 1);
 					this.setState({playlists})
+				})
+				.catch(error => {
+					swal({
+						title: "Failed to delete playlist.",
+						text: error.response.data.message,
+						type: "error",
+						timer: 2000,
+						showConfirmButton: true
+					});
+					
 				});
 
 				break;
@@ -906,21 +1030,17 @@ class Playlists extends React.Component {
 		}
 	}
 
-	change(key) {
-		console.log("mudando");
-	}
-
 	sort(which) {
 		var playlists = this.state.playlists;
 		if (this.state[which] == 0) {
 			playlists.sort(function(a,b) {
-				console.log(a);
+				
 				return (a.props.playlist[which] < b.props.playlist[which]) ? 1 : ((b.props.playlist[which] > a.props.playlist[which]) ? -1 : 0);
 			});
 		}
 		else {
 			playlists.sort(function(a,b) {
-				console.log(a);
+				
 				return (a.props.playlist[which] > b.props.playlist[which]) ? 1 : ((b.props.playlist[which] > a.props.playlist[which]) ? -1 : 0);
 			});
 		}
@@ -968,16 +1088,12 @@ class Playlists extends React.Component {
 		.then(response => {
 			var playlists = [];
 			if (response.data.playlists != null) {
-				console.log("aqui");
-				console.log(this.props);
+				
 				response.data.playlists.forEach((playlist) => {
 					playlists.push(<Playlist playlist={playlist} key={playlist.id} value={playlist.id} onClick={() => this.delete(playlist.id)} onUpdate={() => this.update(playlist.id)} onShow={() => this.props.show(playlist)}/>);
-					console.log(this.props);
+					
 				});
-				// playlists.sort(function(a,b) {
-				// 	console.log(a);
-				// 	return (a.props.playlist.name < b.props.playlist.name) ? 1 : ((b.props.playlist.name > a.props.playlist.name) ? -1 : 0);
-				// } ); 
+				
 
 			}
 			this.setState({ playlists });
@@ -994,9 +1110,9 @@ class Playlists extends React.Component {
 					<table className="table table-striped table-bordered">
 					<thead>
 					<tr>
-					<th onClick={() => this.sort("name")}>Name</th>
-					<th onClick={() => this.sort("size")}>Size</th>
-					<th onClick={() => this.sort("date")}>Date</th>
+					<th onClick={() => this.sort("name")}><i className="fa fa-sort fa-fw"></i>Name</th>
+					<th onClick={() => this.sort("size")}><i className="fa fa-sort fa-fw"></i>Size</th>
+					<th onClick={() => this.sort("date")}><i className="fa fa-sort fa-fw"></i>Date</th>
 					<th></th>
 					<th></th>
 					<th></th>
@@ -1058,7 +1174,7 @@ class Search extends React.Component {
 						songs.push(<AllSong song={song} playlists={playlists} key={song.id} value={song.id} />);
 					});
 				}
-				console.log(playlists);
+				
 				this.setState({playlists});
 				this.setState({ songs });
 				this.forceUpdate();
@@ -1134,15 +1250,29 @@ class EditUser extends React.Component {
 	handleSubmitEmail(event) {
 		axios.put('/api/user/edit', {
 			token: readCookie('token'),
-			email: this.state.email
+			email: this.state.email,
+			name: readCookie('name')
 		})
 		.then(response => {
-			alert("Email changed.");
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Email changed.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.setState({email: ""});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Failed to change email.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
+		
 		event.preventDefault();
 	}
 
@@ -1156,13 +1286,25 @@ class EditUser extends React.Component {
 			name: this.state.name
 		})
 		.then(response => {
-			alert("Name changed.");
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Name changed.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			createCookie('name',this.state.name, 100);
 			document.getElementById('sidebar-nome').innerHTML = readCookie('name');
 			this.setState({name: ""});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Failed to change name.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -1174,14 +1316,27 @@ class EditUser extends React.Component {
 	handleSubmitPassword(event) {
 		axios.put('/api/user/edit', {
 			token: readCookie('token'),
-			password: this.state.password
+			password: this.state.password,
+			name: readCookie('name')
 		})
 		.then(response => {
-			alert("Password changed.");
-			console.log("Actualizado no servidor.");
-			console.log(response);
+			swal({
+				title: "Password changed.",
+				type: "success",
+				timer: 2000,
+				showConfirmButton: true
+			});
 			this.setState({password: ""});
 			this.forceUpdate();
+		})
+		.catch(error => {
+			swal({
+				title: "Failed to change password.",
+				text: error.response.data.message,
+				type: "error",
+				timer: 2000,
+				showConfirmButton: true
+			});
 		});
 		event.preventDefault();
 	}
@@ -1261,7 +1416,7 @@ class Sidebar extends React.Component {
 		this.searchSongs = this.searchSongs.bind(this);
 	}
 	deleteUser() {
-		swal({
+		var teste= swal({
 			title: 'Are you sure you want to delete your account?',
 			text: "You won't be able to revert this!",
 			type: 'warning',
@@ -1276,8 +1431,6 @@ class Sidebar extends React.Component {
 				}
 			})
 			.then(response => {
-				console.log("Removido do servidor.");
-				console.log(response);
 				eraseCookie('token');
 				window.location.href = "/";
 			});
