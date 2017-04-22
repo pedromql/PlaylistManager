@@ -321,6 +321,30 @@ paths:
       tags:
         - song
       summary: Deletes song
+  /song/play:
+    get:
+      operationId: play_song
+      parameters:
+        - name: token
+          in: query
+          description: The user's identification token
+          required: true
+          type: string
+        - name: id
+          in: query
+          description: The song's identification id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Songs retrieved successfully
+        '403':
+          description: Forbidden accesss
+        '500':
+          description: Server Error
+      tags:
+        - song
+      summary: Upload song to client
   /playlists:
     get:
       operationId: list_playlists
