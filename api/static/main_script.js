@@ -28,7 +28,7 @@ function eraseCookie(name) {
 var realPython = React.createClass({
 	render: function() {
 		return (<h2>Greetings, from Real Python!</h2>);
-}
+	}
 });
 
 class AddSong extends React.Component {
@@ -1126,6 +1126,34 @@ class Welcome extends React.Component {
 	}
 }
 
+class DeleteUser extends React.Component {
+	constructor() {
+		super();
+		this.delete = this.delete.bind(this);
+	}
+	delete(event) {
+		axios.delete('/api/user/delete', {
+			params: {
+				token: readCookie('token')
+			}
+		})
+		.then(response => {
+			console.log("Removido do servidor.");
+			console.log(response);
+			eraseCookie('token');
+			window.location.href = "/";
+		});
+		event.preventDefault();
+	}
+	render() {
+		return (
+			<form onSubmit={this.delete}>
+			<input type="submit" value="Delete User"/>
+			</form>
+			);
+	}
+}
+
 ReactDOM.render(
 	<Welcome />,
 	document.getElementById('content')
@@ -1134,4 +1162,9 @@ ReactDOM.render(
 ReactDOM.render(
 	<Options />,
 	document.getElementById('options')
+	);
+
+ReactDOM.render(
+	<DeleteUser />,
+	document.getElementById('delete')
 	);

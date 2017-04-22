@@ -274,7 +274,7 @@ def login():
 def delete_user():
 	try:
 
-		token = request.json['token']
+		token = request.args.get('token')
 
 		session = create_session()
 
