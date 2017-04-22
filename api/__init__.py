@@ -9,7 +9,7 @@ user_password = "mysqldbfores:mysqldbforescrazyguy5436434"
 
 application = app = Flask(__name__)
 
-UPLOAD_FOLDER = '/uploads/Music'
+UPLOAD_FOLDER = 'static/Music'
 ALLOWED_EXTENSIONS = set(['mp3'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -71,3 +71,4 @@ import api.user
 import api.playlist
 import api.main
 import api.song
+import upload
