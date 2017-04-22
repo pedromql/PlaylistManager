@@ -1,0 +1,13 @@
+Flask==0.12
+Flask-SQLAlchemy==2.2
+PyYAML==3.12
+SQLAlchemy==1.1.5
+MarkupSafe==1.0
+click==6.7
+itsdangerous==0.24
+requests==2.9.1
+six==1.10.0
+swagger-spec-validator==2.1.0
+Werkzeug==0.12.1
+PyMySQL==0.7.10
+python-dateutil==2.6.0

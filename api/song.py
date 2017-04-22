@@ -50,6 +50,7 @@ def createsong():
 
         # session.refresh(song)
         # print(song.id)
+        os.makedirs('static/Music', exist_ok=True)
 
         if songfile and songfile.filename != '':
             old_file_position = songfile.tell()
@@ -377,7 +378,7 @@ def accessSong(id):
     session.close()
     return song
 
-
+"""
 @app.route("/api/song/play", methods=['GET'])
 def play_song():
     token = request.args.get('token')
@@ -405,3 +406,4 @@ def play_song():
     except Exception as e:
         print(e)
         return jsonResponse('Error', 'Server Error', 500)
+"""
