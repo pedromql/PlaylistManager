@@ -5,11 +5,11 @@ from flask import *
 import hashlib
 
 
-user_password = "root:root"
+user_password = "mysqldbfores:mysqldbforescrazyguy5436434"
 
 application = app = Flask(__name__)
 
-UPLOAD_FOLDER = '/home/pedromql/Music'
+UPLOAD_FOLDER = '/uploads/Music'
 ALLOWED_EXTENSIONS = set(['mp3'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -17,7 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def create_session():
     Base = declarative_base()
-    engine = create_engine('mysql+pymysql://' + user_password + '@localhost:3306/test_playlist_manager')
+    engine = create_engine('mysql+pymysql://' + user_password + '@aaa78l314k1f4e.clqnkfbup002.us-west-2.rds.amazonaws.com:3306/test_playlist_manager')
     Session = sessionmaker(bind=engine)
     session = Session()
     return session

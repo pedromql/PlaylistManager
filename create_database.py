@@ -4,7 +4,7 @@ from sqlalchemy import Table, Column, Integer, String, create_engine, Sequence, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
-engine = create_engine('mysql+pymysql://root:root@localhost',echo=False)
+engine = create_engine('mysql+pymysql://mysqldbfores:mysqldbforescrazyguy5436434@aaa78l314k1f4e.clqnkfbup002.us-west-2.rds.amazonaws.com:3306',echo=False)
 
 # Create and select database
 engine.execute('CREATE DATABASE IF NOT EXISTS test_playlist_manager')
